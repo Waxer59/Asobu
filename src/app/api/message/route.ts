@@ -1,10 +1,31 @@
 import { createOpenAI } from "@ai-sdk/openai";
 
-import { StreamingTextResponse, streamText } from "ai";
+import { generateText } from "ai";
+import { createStreamableValue } from "ai/rsc";
 
-import { initialProgrammerMessages } from "./messages";
+// import { initialProgrammerMessages } from "./messages";
+
+type ContentResponse = Array<
+  | { type: 'image_url'; image_url: { url: string } }
+  | { type: 'text'; text: string }>;
 
 export const runtime = "edge";
+
+const getInputMessage = async (content: ContentResponse) => {
+  for (const obj of content) {
+    if (obj.type === "text") {
+      return obj.text;
+    }
+  }
+}
+
+const getInputImage = async (content: ContentResponse) => {
+  for (const obj of content) {
+    if (obj.type === "image_url") {
+      return obj.image_url.url;
+    }
+  }
+}
 
 const openai = createOpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -14,25 +35,29 @@ const openai = createOpenAI({
 export async function POST(req: Request) {
   const { content } = await req.json();
 
-  // const settings = {
-  //   messages: [...initialProgrammerMessages, { role: "user", content }],
-  //   model: "gpt-4-vision-preview",
-  //   stream: true,
-  //   max_tokens: 4096,
-  // };
+  const message = await getInputMessage(content);
+  const image = await getInputImage(content);
 
-  // const result = await streamText(
-  //   model: "gpt-4-vision-preview",
-  //   content.messages,
-  // )
+  const result = await generateText({
+    model: openai("gpt-4o-mini"),
+    system: "You are a helpful assistant.",
+    messages: [
+      {
+        role: "user",
+        content: [
+          {
+            type: "text",
+            text:
+              `What’s in this image ${message}?` ?? "What’s in this image?",
+          },
+          {
+            type: "image",
+            image: image ?? "",
+          },
+        ],
+      },
+    ],
+  });
 
-  const result  = await openai.completion(
-    "gpt-4o-mini",
-    {
-      //Stuff to handle with vision
-    }
-  )
-
-  // return result.toAIStreamResponse();
-  return new Response("Hello, World!");
+  return new Response(result.text);
 }
