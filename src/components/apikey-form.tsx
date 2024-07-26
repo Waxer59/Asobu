@@ -1,32 +1,11 @@
 import { ReactEventHandler, useEffect, useState } from "react";
-import ChatContent from "./chat-content";
-import ChatList from "./chat-list";
 
-export default function Page({ params }: { params: { chatId?: string[] } }) {
-  const chatId = params.chatId?.[0];
+export default async function APIKeyForm () {
+      const chatId = params.chatId?.[0];
 
   const [isAPIKeySet, setIsAPIKeySet] = useState(false);
 
   const [apiKey, setApiKey] = useState("");
-
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (apiKey) {
-      //sent it to the backend so it can be stored in the environment
-      fetch("/api/key", {
-        method: "POST",
-        body: JSON.stringify({ apiKey }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
-  };
-
-  const checkAPIKeyFromEnv = async() => {
-    const res = await fetch("/api/key");
-    const data = await res.json();
-    return data
-  }
 
   useEffect(() => {
     console.log("Checking API Key");
@@ -45,10 +24,8 @@ export default function Page({ params }: { params: { chatId?: string[] } }) {
     }
 
   }, []);
-
-  console.log(isAPIKeySet);
-  return (
-    <>
+    return(
+            <>
       {isAPIKeySet ? (
         <div className="w-full h-full flex">
           <div className="w-80 h-full max-h-full border-r-2 border-neutral-300 dark:border-neutral-700 overflow-auto">
@@ -79,6 +56,5 @@ export default function Page({ params }: { params: { chatId?: string[] } }) {
         </div>
       )}
     </>
-  );
-}
+    )
 }
