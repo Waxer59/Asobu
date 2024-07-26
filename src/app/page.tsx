@@ -1,14 +1,14 @@
 "use client";
 
 import Draggable from "react-draggable";
-import { Map } from "@components/Map";
 import { useEffect, useRef } from "react";
 import { generateText, tool } from "ai";
 import { createOpenAI } from "@ai-sdk/openai";
 import { z } from "zod";
+import { MapTab } from "@components/MapTab";
 
 const openai = createOpenAI({
-  apiKey: "sk-proj-okCilpHVZcZqOjZjY4rtT3BlbkFJr1SDhs7I9a0ONpC8beWS"
+  apiKey: ""
 });
 
 export default function Home() {
@@ -69,7 +69,7 @@ export default function Home() {
           id="handle"
           className="p-5 rounded-md bg-black absolute cursor-move"
         >
-          <Map />
+          <MapTab />
         </div>
       </Draggable>
       <button onClick={onClick}>Test</button>
