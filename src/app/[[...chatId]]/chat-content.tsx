@@ -2,14 +2,14 @@
 
 import { useState, useRef } from "react";
 
-import ChatInput from "@/components/chat-input";
+import ChatInput from "@components/chat-input";
 
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus as dark } from "react-syntax-highlighter/dist/esm/styles/prism";
 
-import { convertFileToBase64 } from "@/lib/utils";
+import { convertFileToBase64 } from "@lib/utils";
 
 export default function ChatContent() {
   const [assisnantResponse, setAssistantResponse] = useState("");
@@ -103,6 +103,7 @@ export default function ChatContent() {
               return match ? (
                 <SyntaxHighlighter
                   PreTag="div"
+                  // eslint-disable-next-line
                   children={String(children).replace(/\n$/, "")}
                   language={match[1]}
                   style={dark}

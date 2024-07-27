@@ -1,7 +1,8 @@
 import { create } from "zustand";
+import { devtools } from "zustand/middleware";
 
 interface State {
-  apiKey: string | undefined;
+  apiKey?: string;
 }
 
 interface Actions {
@@ -9,12 +10,14 @@ interface Actions {
 }
 
 const initialState: State = {
-  apiKey: "",
+  apiKey: ""
 };
 
-export const useStore = create<State & Actions>(() => ({
-  ...initialState,
-  setApiKey: (apiKey) => {
-    useStore.setState({ apiKey });
-  },
-}));
+export const useAiStore = create<State & Actions>()(
+  devtools((set) => ({
+    ...initialState,
+    setApiKey: (apiKey) => {
+      set({ apiKey });
+    }
+  }))
+);

@@ -6,19 +6,20 @@ import {
   FormLabel,
   FormMessage,
   FormControl,
-  Form,
-} from "@/components/form";
-import { Input } from "./input";
-import { Button } from "./button";
+  Form
+} from "@shadcn/form";
+import { Input } from "@shadcn/input";
+import { Button } from "@shadcn/button";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { useStore } from "@/store/ai";
+import { useAiStore } from "@store/ai";
+import { Card } from "@shadcn/card";
 
 const formSchema = z.object({
-  apiKey: z.string(),
+  apiKey: z.string()
 });
 
 export default function APIKeyForm() {
@@ -26,54 +27,62 @@ export default function APIKeyForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      apiKey: "",
-    },
+      apiKey: ""
+    }
   });
+  const setApiKey = useAiStore((state) => state.setApiKey);
+  const apiKey = useAiStore((state) => state.apiKey);
 
   // 2. Define a submit handler.
   function onSubmit(values: z.infer<typeof formSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
-    useStore.getState().setApiKey(values.apiKey);
+    const apiKey = values.apiKey;
 
-    //sanity check
-    console.log(useStore.getState().apiKey);
-
-    //After setting the API key, we hide the top layer
-    if (useStore.getState().apiKey) {
-      const modal = document.getElementById("modal-1");
-      if (modal) {
-        modal.style.display = "none";
-      }
+    if (!apiKey.trim()) {
+      // TODO: SHOW ERROR TOAST
+      return;
     }
+
+    setApiKey(apiKey);
   }
 
   return (
-    <div id="modal-1" className="grid h-screen place-items-center">
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-          <FormField
-            control={form.control}
-            name="apiKey"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Ingresa tu API Key</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="shadcn"
-                    {...field}
-                    className="text-black"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <Button type="submit" variant={"outline"}>
-            Enviar
-          </Button>
-        </form>
-      </Form>
+    <div
+      className={`grid h-screen place-items-center ${
+        apiKey ? "hidden" : ""
+      } absolute w-full h-full bg-zinc-900/70`}
+    >
+      <Card className="p-6 bg-neutral-900">
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-8 flex flex-col gap-2"
+          >
+            <FormField
+              control={form.control}
+              name="apiKey"
+              render={({ field }) => (
+                <FormItem className="flex flex-col gap-4">
+                  <FormLabel className="text-xl text-center">
+                    Ingresa tu API Key
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="sk-..."
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Button type="submit">
+              Enviar
+            </Button>
+          </form>
+        </Form>
+      </Card>
     </div>
   );
 }
