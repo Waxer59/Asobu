@@ -4,8 +4,13 @@ import mapboxgl, { Map } from "mapbox-gl";
 import { useEffect, useRef, useState } from "react";
 // @ts-expect-error no types file
 import MapboxDirections from "@mapbox/mapbox-gl-directions/dist/mapbox-gl-directions";
+import "@mapbox/mapbox-gl-directions/src/mapbox-gl-directions.css";
 
-export const MapTab = () => {
+interface Props {
+  destination: string;
+}
+
+export const MapTab = ({ destination }: Props) => {
   const [lat, setLat] = useState<number>(0);
   const [lng, setLng] = useState<number>(0);
   const watchID = useRef<number | null>(null);
@@ -20,7 +25,6 @@ export const MapTab = () => {
 
   useEffect(() => {
     map.current?.setCenter({ lat, lng });
-    directions.current?.setOrigin([lng, lat]);
   }, [lat, lng]);
 
   useEffect(() => {
@@ -39,10 +43,23 @@ export const MapTab = () => {
     });
 
     directions.current = new MapboxDirections({
-      accessToken: mapboxgl.accessToken
+      accessToken: mapboxgl.accessToken,
+      unit: "metric",
+      profile: "mapbox/walking"
     });
 
     map.current.addControl(directions.current, "top-left");
+
+    const setRoute: PositionCallback = (position) => {
+      const { latitude: lat, longitude: lng } = position.coords;
+      map.current?.setCenter({ lat, lng });
+      map.current?.on("load", () => {
+        directions.current.setOrigin([lng, lat]);
+        directions.current.setDestination(destination);
+      });
+    };
+
+    navigator.geolocation.getCurrentPosition(setRoute);
 
     return () => {
       // Clean up watch method

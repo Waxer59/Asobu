@@ -69,10 +69,9 @@ export default function Home() {
           id="handle"
           className="p-5 rounded-md bg-black absolute cursor-move"
         >
-          <MapTab />
+          <MapTab destination="Atocha" />
         </div>
       </Draggable>
-      <button onClick={onClick}>Test</button>
     </>
   );
 }
