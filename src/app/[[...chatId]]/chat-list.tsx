@@ -1,4 +1,4 @@
-export default async function ChatList() {
+export default function ChatList() {
   return (
     <div className="flex flex-col p-10 gap-y-4">
       <div className="truncate">
