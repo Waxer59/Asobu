@@ -1,9 +1,23 @@
-enum UIActions {
-  OPEN_MAPS,
-  OPEN_TEACH_MODE
+export enum AiActions {
+  NONE,
+  OPEN_MAP,
+  CLOSE_MAP,
+  OPEN_TEACH_MODE,
+  CLOSE_TEACH_MODE
 }
 
-interface AIServerActionResponse {
-  action: UIActions | null;
-  data: any;
+export interface OpenMapData {
+  from?: string;
+  to: string;
+}
+
+export interface AiRequestData {
+  message: string;
+  img: string;
+}
+
+export interface AiResponseData {
+  text: string;
+  action?: AiActions;
+  data?: OpenMapData;
 }

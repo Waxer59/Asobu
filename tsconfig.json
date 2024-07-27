@@ -19,8 +19,10 @@
     ],
     "paths": {
       "@/*": ["./src/*"],
+      "@shadcn/*": ["./src/components/shadcn/*"],
       "@components/*": ["./src/components/*"],
-      "@helpers/*": ["./src/helpers/*"]
+      "@store/*": ["./src/store/*"],
+      "@lib/*": ["./src/lib/*"],
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
