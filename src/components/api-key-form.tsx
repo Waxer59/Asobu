@@ -70,7 +70,7 @@ export default function APIKeyForm() {
             )}
           />
           <Button type="submit" variant={"outline"}>
-            Submit
+            Enviar
           </Button>
         </form>
       </Form>
