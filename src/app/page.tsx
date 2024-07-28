@@ -8,6 +8,7 @@ import { use, useState } from "react";
 import { DialogForAPIKey } from "@/components/api-key-dialog";
 import { useToast } from "@/hooks/useToast";
 import { useEffect } from "react";
+import { OptionsBar } from "./[[...chatId]]/options-bar";
 
 export default function Page() {
   // Let the user know with a toast to add API Key
@@ -30,6 +31,7 @@ export default function Page() {
       <div className="h-full flex-1 flex flex-col">
         <DialogForAPIKey />
         <ChatContent />
+        <OptionsBar />
       </div>
     </main>
   );

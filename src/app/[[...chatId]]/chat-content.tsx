@@ -12,7 +12,7 @@ import { vscDarkPlus as dark } from "react-syntax-highlighter/dist/esm/styles/pr
 import { convertFileToBase64 } from "@lib/utils";
 
 export default function ChatContent() {
-  const [assisnantResponse, setAssistantResponse] = useState("");
+  const [assistantResponse, setAssistantResponse] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const abortControllerRef = useRef<AbortController | null>(null);
 
@@ -118,7 +118,7 @@ export default function ChatContent() {
             },
           }}
         >
-          {assisnantResponse}
+          {assistantResponse}
         </Markdown>
       </div>
       <ChatInput
