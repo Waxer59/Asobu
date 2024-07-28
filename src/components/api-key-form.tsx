@@ -17,6 +17,7 @@ import { z } from "zod";
 
 import { useAiStore } from "@store/ai";
 import { DialogClose } from "./shadcn/dialog";
+import { useToast } from "@/hooks/useToast";
 
 const formSchema = z.object({
   apiKey: z.string(),
@@ -30,6 +31,7 @@ export default function APIKeyForm() {
       apiKey: "",
     },
   });
+  const { toast } = useToast();
   const setApiKey = useAiStore((state) => state.setApiKey);
   const apiKey = useAiStore((state) => state.apiKey);
 
@@ -39,8 +41,15 @@ export default function APIKeyForm() {
     // ✅ This will be type-safe and validated.
     const apiKey = values.apiKey;
 
+    toast({
+      description: "Se guardó la API Key",
+    });
+
     if (!apiKey.trim()) {
       // TODO: SHOW ERROR TOAST
+      toast({
+        description: "La API Key no puede estar vacía",
+      });
       return;
     }
 
@@ -63,7 +72,7 @@ export default function APIKeyForm() {
                   Ingresa tu API Key
                 </FormLabel>
                 <FormControl>
-                  <Input placeholder="sk-..." {...field} required />
+                  <Input placeholder="sk-..." {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
