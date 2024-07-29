@@ -4,10 +4,11 @@ import APIKeyForm from "@/components/api-key-form";
 import ChatContent from "./[[...chatId]]/chat-content";
 import ChatList from "./[[...chatId]]/chat-list";
 import { useAiStore } from "@/store/ai";
-import { use, useState } from "react";
 import { DialogForAPIKey } from "@/components/api-key-dialog";
 import { useToast } from "@/hooks/useToast";
 import { useEffect } from "react";
+import { SessionProvider } from "next-auth/react";
+import SpotifyWidget from "@/components/SpotifyWidget";
 
 export default function Page() {
   // Let the user know with a toast to add API Key
@@ -23,14 +24,19 @@ export default function Page() {
     }
   }, [apiKey]);
   return (
-    <main className="w-full h-full flex">
-      <div className="w-80 h-full max-h-full border-r-2 border-neutral-300 dark:border-neutral-700 overflow-auto">
-        <ChatList />
-      </div>
-      <div className="h-full flex-1 flex flex-col">
-        <DialogForAPIKey />
-        <ChatContent />
-      </div>
-    </main>
+    <SessionProvider>
+      <main className="w-full h-full flex">
+        <div className="w-80 h-full max-h-full border-r-2 border-neutral-300 dark:border-neutral-700 overflow-auto">
+          <ChatList />
+        </div>
+        <div className="h-full flex-1 flex flex-col">
+          <DialogForAPIKey />
+          <div className="flex items-center justify-end w-full">
+            <SpotifyWidget />
+          </div>
+          <ChatContent />
+        </div>
+      </main>
+    </SessionProvider>
   );
 }
