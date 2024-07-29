@@ -1,22 +1,21 @@
-"use client";
+'use client';
 
-import APIKeyForm from "@components/api-key-form";
-import ChatList from "./[[...chatId]]/chat-list";
-import { useAiStore } from "@/store/ai";
-import { useEffect, useState } from "react";
-import { DialogForAPIKey } from "@components/api-key-dialog";
-import { useToast } from "@/hooks/useToast";
-import { getAiResponse } from "./actions";
-import { AiActions, AiResponseData, OpenMapData } from "@/types/types";
-import { MapTab } from "@components/mapTab";
+import ChatList from './[[...chatId]]/chat-list';
+import { useAiStore } from '@/store/ai';
+import { useEffect, useState } from 'react';
+import { DialogForAPIKey } from '@components/api-key-dialog';
+import { useToast } from '@hooks/useToast';
+import { AiActions, AiResponseData, OpenMapData } from '@/types/types';
+import { MapTab } from '@components/mapTab';
+import ChatContent from './[[...chatId]]/chat-content';
 
 export default function Page() {
   // Let the user know with a toast to add API Key
   const { toast } = useToast();
   const apiKey = useAiStore((state) => state.apiKey);
   const [showMap, setShowMap] = useState<boolean>(false);
-  const [mapDestination, setMapDestination] = useState<string>("");
-  const [mapOrigin, setMapOrigin] = useState<string | undefined>("");
+  const [mapDestination, setMapDestination] = useState<string>('');
+  const [mapOrigin, setMapOrigin] = useState<string | undefined>('');
   const [aiResponseData, setAiResponseData] = useState<AiResponseData | null>(
     null
   );
@@ -34,15 +33,15 @@ export default function Page() {
 
   const onCloseMapTab = () => {
     setShowMap(false);
-    setMapDestination("");
+    setMapDestination('');
     setMapOrigin(undefined);
   };
 
   useEffect(() => {
-    console.log("apiKey value:", apiKey);
+    console.log('apiKey value:', apiKey);
     if (!apiKey) {
       toast({
-        description: "Por favor añade tu API Key",
+        description: 'Por favor añade tu API Key'
       });
     }
   }, [apiKey]);
