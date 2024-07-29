@@ -2,13 +2,18 @@
 
 import APIKeyForm from "@components/api-key-form";
 import ChatList from "./[[...chatId]]/chat-list";
-import { MapTab } from "@components/mapTab";
+import { useAiStore } from "@/store/ai";
 import { useEffect, useState } from "react";
-import { Button } from "@/components/shadcn/button";
+import { DialogForAPIKey } from "@components/api-key-dialog";
+import { useToast } from "@/hooks/useToast";
 import { getAiResponse } from "./actions";
 import { AiActions, AiResponseData, OpenMapData } from "@/types/types";
+import { MapTab } from "@components/mapTab";
 
 export default function Page() {
+  // Let the user know with a toast to add API Key
+  const { toast } = useToast();
+  const apiKey = useAiStore((state) => state.apiKey);
   const [showMap, setShowMap] = useState<boolean>(false);
   const [mapDestination, setMapDestination] = useState<string>("");
   const [mapOrigin, setMapOrigin] = useState<string | undefined>("");
@@ -33,8 +38,17 @@ export default function Page() {
     setMapOrigin(undefined);
   };
 
+  useEffect(() => {
+    console.log("apiKey value:", apiKey);
+    if (!apiKey) {
+      toast({
+        description: "Por favor añade tu API Key",
+      });
+    }
+  }, [apiKey]);
+
   return (
-    <div className="bg-zinc-900 w-full h-full">
+    <main className="w-full h-full flex">
       {showMap && (
         <MapTab
           destination={mapDestination}
@@ -42,14 +56,13 @@ export default function Page() {
           onClose={onCloseMapTab}
         />
       )}
-      <div className="w-full h-full flex">
-        <div className="w-80 h-full max-h-full border-r-2 border-neutral-300 dark:border-neutral-700 overflow-auto">
-          <ChatList />
-        </div>
-        <div className="h-full flex-1 flex flex-col">
-          {/* <ChatContent /> */}
-        </div>
+      <div className="w-80 h-full max-h-full border-r-2 border-neutral-300 dark:border-neutral-700 overflow-auto">
+        <ChatList />
       </div>
-    </div>
+      <div className="h-full flex-1 flex flex-col">
+        <DialogForAPIKey />
+        <ChatContent />
+      </div>
+    </main>
   );
 }

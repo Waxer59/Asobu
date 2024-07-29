@@ -6,6 +6,7 @@ import { cn } from "@lib/utils";
 
 import ImageSelection from "./image-selection";
 
+
 export default function ExpandingInput({
   onSubmit,
   onStop,
