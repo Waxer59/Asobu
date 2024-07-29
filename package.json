@@ -56,9 +56,6 @@
     "apps/**/*.{ts,tsx,js,jsx}": [
       "eslint --fix"
     ],
-    "packages/**/*.ts": [
-      "eslint --fix"
-    ],
     "*.{ts,tsx,js,jsx,html,css,md}": [
       "prettier --write"
     ]
