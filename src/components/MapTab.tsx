@@ -4,19 +4,28 @@ import mapboxgl, { Map } from "mapbox-gl";
 import { useEffect, useRef, useState } from "react";
 // @ts-expect-error no types file
 import MapboxDirections from "@mapbox/mapbox-gl-directions/dist/mapbox-gl-directions";
-import "@mapbox/mapbox-gl-directions/src/mapbox-gl-directions.css";
+import "@mapbox/mapbox-gl-directions/dist/mapbox-gl-directions.css";
+import { Card } from "@shadcn/card";
+import Draggable from "react-draggable";
+import { BounceLoader } from "react-spinners";
+import { X } from "lucide-react";
+import { Button } from "./shadcn/button";
 
 interface Props {
+  from?: string;
   destination: string;
+  onClose: () => void;
 }
 
-export const MapTab = ({ destination }: Props) => {
+export const MapTab = ({ destination, from, onClose }: Props) => {
   const [lat, setLat] = useState<number>(0);
   const [lng, setLng] = useState<number>(0);
   const watchID = useRef<number | null>(null);
   const directions = useRef<any>(null);
   const mapContainer = useRef<any>(null);
   const map = useRef<Map | null>(null);
+  const dragRef = useRef(null);
+  const [isMapLoading, setIsMapLoading] = useState<boolean>(true);
 
   const getCurrentPositionCb: PositionCallback = (position) => {
     setLat(position.coords.latitude);
@@ -24,6 +33,8 @@ export const MapTab = ({ destination }: Props) => {
   };
 
   useEffect(() => {
+    if (from) return;
+
     map.current?.setCenter({ lat, lng });
   }, [lat, lng]);
 
@@ -54,15 +65,16 @@ export const MapTab = ({ destination }: Props) => {
       const { latitude: lat, longitude: lng } = position.coords;
       map.current?.setCenter({ lat, lng });
       map.current?.on("load", () => {
-        directions.current.setOrigin([lng, lat]);
+        directions.current.setOrigin(from ?? [lng, lat]);
         directions.current.setDestination(destination);
+        setIsMapLoading(false);
       });
     };
 
     navigator.geolocation.getCurrentPosition(setRoute);
 
     return () => {
-      // Clean up watch method
+      // Clean up
       map.current?.remove();
       if (watchID.current) {
         navigator.geolocation.clearWatch(watchID.current);
@@ -70,5 +82,31 @@ export const MapTab = ({ destination }: Props) => {
     };
   }, []);
 
-  return <div id="map" ref={mapContainer} className="h-96 w-96" />;
+  return (
+    <Draggable nodeRef={dragRef} bounds="parent" cancel="#map">
+      <div ref={dragRef} className="absolute">
+        <Card className="cursor-move p-7 flex items-center">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute top-2 right-2 w-5 h-5"
+            onClick={onClose}
+          >
+            <X />
+          </Button>
+          {isMapLoading && (
+            <div className="flex flex-col items-center justify-center gap-4 w-80 h-80">
+              <BounceLoader color="#e2e2e2" />
+              <span className="font-bold">Loading map...</span>
+            </div>
+          )}
+          <div
+            ref={mapContainer}
+            id="map"
+            className={`h-80 rounded-md flex ${isMapLoading ? "hidden" : ""}`}
+          ></div>
+        </Card>
+      </div>
+    </Draggable>
+  );
 };

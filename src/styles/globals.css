@@ -63,7 +63,66 @@
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+.mapboxgl-canvas {
+  border-radius: 10px;
+  width: 320px;
+}
+
+.mapboxgl-ctrl-attrib-button {
+  display: none;
+}
+
+.mapboxgl-ctrl-attrib-inner {
+  text-align: center;
+  font-size: 0.75rem;
+  margin-top: 10px;
+}
+
+.directions-control-directions {
+  border-radius: 10px;
+}
+
+.mapbox-directions-steps {
+  max-height: 150px;
+}
+
+.mapboxgl-control-container {
+  margin-left: 20px;
+}
+
+.mapbox-directions-instructions {
+  overflow-x: hidden !important;
+}
+
+@supports selector(::-webkit-scrollbar) {
+
+  /* width */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+    background: #2e2c2c;
+    border-radius: 5px;
+  }
+
+  /* Handle on hover */
+  ::-webkit-scrollbar-thumb:hover {
+    background: #4b4848;
+  }
+}
+
+@supports not selector(::-webkit-scrollbar) {
+  * {
+    scrollbar-color: #2e2c2c transparent;
+    scrollbar-width: thin;
   }
 }

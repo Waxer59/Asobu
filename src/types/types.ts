@@ -9,15 +9,16 @@ export enum AiActions {
 export interface OpenMapData {
   from?: string;
   to: string;
+  action: AiActions.OPEN_MAP;
 }
 
 export interface AiRequestData {
   message: string;
-  img: string;
+  img?: string;
 }
 
 export interface AiResponseData {
   text: string;
-  action?: AiActions;
+  action: AiActions;
   data?: OpenMapData;
 }
