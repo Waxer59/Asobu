@@ -1,15 +1,14 @@
-"use client";
+'use client';
 
-import mapboxgl, { Map } from "mapbox-gl";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from 'react';
+import mapboxgl, { Map } from 'mapbox-gl';
 // @ts-expect-error no types file
-import MapboxDirections from "@mapbox/mapbox-gl-directions/dist/mapbox-gl-directions";
-import "@mapbox/mapbox-gl-directions/dist/mapbox-gl-directions.css";
-import { Card } from "@shadcn/card";
-import Draggable from "react-draggable";
-import { BounceLoader } from "react-spinners";
-import { X } from "lucide-react";
-import { Button } from "./shadcn/button";
+import MapboxDirections from '@mapbox/mapbox-gl-directions/dist/mapbox-gl-directions';
+import '@mapbox/mapbox-gl-directions/dist/mapbox-gl-directions.css';
+import { Card, Button } from '@shadcn/index';
+import Draggable from 'react-draggable';
+import { BounceLoader } from 'react-spinners';
+import { X } from 'lucide-react';
 
 interface Props {
   from?: string;
@@ -48,23 +47,23 @@ export const MapTab = ({ destination, from, onClose }: Props) => {
     mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!;
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
-      style: "mapbox://styles/mapbox/standard",
+      style: 'mapbox://styles/mapbox/standard',
       center: [0, 0],
       zoom: 14
     });
 
     directions.current = new MapboxDirections({
       accessToken: mapboxgl.accessToken,
-      unit: "metric",
-      profile: "mapbox/walking"
+      unit: 'metric',
+      profile: 'mapbox/walking'
     });
 
-    map.current.addControl(directions.current, "top-left");
+    map.current.addControl(directions.current, 'top-left');
 
     const setRoute: PositionCallback = (position) => {
       const { latitude: lat, longitude: lng } = position.coords;
       map.current?.setCenter({ lat, lng });
-      map.current?.on("load", () => {
+      map.current?.on('load', () => {
         directions.current.setOrigin(from ?? [lng, lat]);
         directions.current.setDestination(destination);
         setIsMapLoading(false);
@@ -90,8 +89,7 @@ export const MapTab = ({ destination, from, onClose }: Props) => {
             variant="ghost"
             size="icon"
             className="absolute top-2 right-2 w-5 h-5"
-            onClick={onClose}
-          >
+            onClick={onClose}>
             <X />
           </Button>
           {isMapLoading && (
@@ -103,8 +101,7 @@ export const MapTab = ({ destination, from, onClose }: Props) => {
           <div
             ref={mapContainer}
             id="map"
-            className={`h-80 rounded-md flex ${isMapLoading ? "hidden" : ""}`}
-          ></div>
+            className={`h-80 rounded-md flex ${isMapLoading ? 'hidden' : ''}`}></div>
         </Card>
       </div>
     </Draggable>
