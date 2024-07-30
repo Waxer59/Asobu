@@ -5,12 +5,18 @@ import {
   TooltipTrigger,
   Card,
   Button,
-  buttonVariants
+  buttonVariants,
+  CollapsibleTrigger,
+  Collapsible,
+  CollapsibleContent
 } from '@shadcn/index';
 import {
   HomeIcon,
+  Languages,
   MessageCircle,
   Mic,
+  Music,
+  Navigation,
   Presentation,
   Wrench
 } from 'lucide-react';
@@ -32,6 +38,7 @@ export const DockBar = () => {
             <TooltipContent>Go home</TooltipContent>
           </Tooltip>
         </TooltipProvider>
+
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
@@ -44,6 +51,7 @@ export const DockBar = () => {
             <TooltipContent>Chat</TooltipContent>
           </Tooltip>
         </TooltipProvider>
+
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
@@ -66,18 +74,58 @@ export const DockBar = () => {
             <TooltipContent>Teach mode</TooltipContent>
           </Tooltip>
         </TooltipProvider>
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Link
-                href="/"
-                className={`${buttonVariants({ variant: 'ghost', size: 'icon' })} absolute -right-14`}>
-                <Wrench className="stroke-1" />
-              </Link>
-            </TooltipTrigger>
-            <TooltipContent>Tools</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+
+        <Collapsible>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <CollapsibleTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute -right-14">
+                    <Wrench className="stroke-1" />
+                  </Button>
+                </CollapsibleTrigger>
+              </TooltipTrigger>
+              <TooltipContent>Tools</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+          <CollapsibleContent>
+            <Card className="absolute flex gap-4 p-2 top-0 left-64">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button size="icon" variant="ghost">
+                      <Languages />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Translate</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button size="icon" variant="ghost">
+                      <Navigation />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Navigation</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button size="icon" variant="ghost">
+                      <Music />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Music</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </Card>
+          </CollapsibleContent>
+        </Collapsible>
       </Card>
     </div>
   );

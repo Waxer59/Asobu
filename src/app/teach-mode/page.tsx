@@ -8,8 +8,9 @@ import {
 import { ExcalidrawImperativeAPI } from '@excalidraw/excalidraw/types/types';
 import { useState } from 'react';
 import { DockBar } from '@components/dockBar';
-import { Card } from '@shadcn/index';
+import { Button, Card } from '@shadcn/index';
 import { ApiKeyDialog } from '@components/api-key-dialog';
+import { convertBlobToBase64 } from '@/lib/utils';
 
 export default function Page() {
   const [excalidrawAPI, setExcalidrawAPI] =
@@ -30,16 +31,11 @@ export default function Page() {
   };
 
   return (
-    <div className="flex justify-center items-center mt-6">
+    <div className="flex justify-center items-center pt-6">
       <DockBar />
       <ApiKeyDialog />
       <Card className="max-w-[1500px] w-[90%] h-[800px] p-3">
-        <Excalidraw
-          theme="dark"
-          excalidrawAPI={(api: ExcalidrawImperativeAPI) =>
-            setExcalidrawAPI(api)
-          }
-        />
+        <Excalidraw theme="dark" excalidrawAPI={setExcalidrawAPI} />
       </Card>
     </div>
   );

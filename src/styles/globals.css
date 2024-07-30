@@ -69,6 +69,10 @@
   }
 }
 
+.excalidraw {
+  border-radius: 10px;
+}
+
 .mapboxgl-canvas {
   border-radius: 10px;
   width: 320px;
@@ -101,7 +105,6 @@
 }
 
 @supports selector(::-webkit-scrollbar) {
-
   /* width */
   ::-webkit-scrollbar {
     width: 6px;
