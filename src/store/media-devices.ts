@@ -5,7 +5,7 @@ import { createRef, MutableRefObject, useRef } from "react";
 
 interface State {
   baseVideoConstraints: WebcamProps["videoConstraints"];
-  file: File | null;
+  file?: File | null;
 }
 
 interface Actions {
