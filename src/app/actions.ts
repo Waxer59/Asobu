@@ -1,8 +1,14 @@
 "use server";
 
-import { AiRequestData, AiResponseData } from "@/types/types";
+import {
+  AiActions,
+  AiRequestData,
+  AiResponseData,
+  OpenMapData
+} from "@/types/types";
 import { createOpenAI } from "@ai-sdk/openai";
 import { generateText } from "ai";
+import { z } from "zod";
 
 export async function getAiResponse(
   apiKey: string,
@@ -17,23 +23,41 @@ export async function getAiResponse(
     compatibility: "strict" // strict mode, enable when using the OpenAI API
   });
 
-  const result = await generateText({
+  const { text, toolResults } = await generateText({
     model: openai("gpt-4o"),
     system: "You are a helpful assistant.",
-    messages: [
-      {
-        role: "user",
-        content: [
-          {
-            type: "text",
-            text: `Do you have any information regarding this ${message}?`
-          }
-        ]
+    toolChoice: "required",
+    messages: [{ role: "user", content: message }],
+    tools: {
+      other: {
+        description: "Use this tool when you need to answer any question",
+        parameters: z.object({
+          question: z.string().describe("The question to answer")
+        }),
+        execute: async ({ question }) => {
+          return `Answering the question: ${question}`;
+        }
+      },
+      navigation: {
+        description: "Use this tool to navigate to a specific location",
+        parameters: z.object({
+          to: z.string().describe("The location to navigate to"),
+          from: z.string().optional().describe("The starting point")
+        }),
+        execute: async ({ to, from }): Promise<OpenMapData> => {
+          return {
+            to,
+            from,
+            action: AiActions.OPEN_MAP
+          };
+        }
       }
-    ]
+    }
   });
 
   return {
-    text: result.text
+    text,
+    data: (toolResults[0].result as OpenMapData) ?? null,
+    action: (toolResults[0].result as OpenMapData).action ?? AiActions.NONE
   };
 }

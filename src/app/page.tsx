@@ -1,49 +1,55 @@
-"use client";
+'use client';
 
-import ChatContent from "./[[...chatId]]/chat-content";
-import { useAiStore } from "@/store/ai";
-import { DialogForAPIKey } from "@/components/api-key-dialog";
-import { useToast } from "@/hooks/useToast";
-import { useEffect } from "react";
-import { OptionsBar } from "./[[...chatId]]/options-bar";
-import Webcam from "react-webcam";
-import { useMediaStore } from "@/store/media-devices";
+import ChatList from './[[...chatId]]/chat-list';
+import { useEffect, useState } from 'react';
+import { ApiKeyDialog } from '@components/api-key-dialog';
+import { AiActions, AiResponseData, OpenMapData } from '@/types/types';
+import { MapTab } from '@components/mapTab';
+import ChatContent from './[[...chatId]]/chat-content';
+import { DockBar } from '@/components/dockBar';
 
 export default function Page() {
-  // Let the user know with a toast to add API Key
-  const { toast } = useToast();
-  const apiKey = useAiStore((state) => state.apiKey);
-  const cameraRefOnMainLayer = useMediaStore.getState().ref;
-  const videoConstraints = useMediaStore.getState().baseVideoConstraints;
+  const [showMap, setShowMap] = useState<boolean>(false);
+  const [mapDestination, setMapDestination] = useState<string>('');
+  const [mapOrigin, setMapOrigin] = useState<string | undefined>('');
+  const [aiResponseData, setAiResponseData] = useState<AiResponseData | null>(
+    null
+  );
 
   useEffect(() => {
-    console.log("apiKey value:", apiKey);
-    if (!apiKey) {
-      toast({
-        description: "Por favor añade tu API Key",
-      });
+    switch (aiResponseData?.action) {
+      case AiActions.OPEN_MAP:
+        const { from, to } = aiResponseData.data as OpenMapData;
+        setShowMap(true);
+        setMapDestination(to);
+        setMapOrigin(from ?? undefined);
+        break;
     }
-  }, [apiKey]);
+  }, [aiResponseData]);
+
+  const onCloseMapTab = () => {
+    setShowMap(false);
+    setMapDestination('');
+    setMapOrigin(undefined);
+  };
 
   return (
-    <main className="">
-      {/* <div className="w-80 h-full max-h-full border-r-2 border-neutral-300 dark:border-neutral-700 overflow-auto">
+    <main className="w-full h-full flex">
+      {showMap && (
+        <MapTab
+          destination={mapDestination}
+          from={mapOrigin}
+          onClose={onCloseMapTab}
+        />
+      )}
+      <div className="w-80 h-full max-h-full border-r-2 border-neutral-300 dark:border-neutral-700 overflow-auto">
         <ChatList />
-      </div> */}
-      <div className="flex-1 flex flex-col h-screen">
-        <DialogForAPIKey />
-        <div className="self-center place-self-center w-1/2 border-2 border-gray-700 flex flex-col gap-y-10 rounded-md">
-          <Webcam
-            audio={false}
-            ref={cameraRefOnMainLayer}
-            screenshotFormat="image/jpeg"
-            videoConstraints={videoConstraints}
-            className="rounded-md p-6"
-          />
-          <ChatContent />
-          <OptionsBar />
-        </div>
       </div>
+      <div className="h-full flex-1 flex flex-col">
+        <ApiKeyDialog />
+        <ChatContent />
+      </div>
+      <DockBar />
     </main>
   );
 }
