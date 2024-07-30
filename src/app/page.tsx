@@ -1,12 +1,14 @@
 'use client';
 
-import ChatList from './[[...chatId]]/chat-list';
-import { useEffect, useState } from 'react';
-import { ApiKeyDialog } from '@components/api-key-dialog';
+import { useCallback, useEffect, useState } from 'react';
 import { AiActions, AiResponseData, OpenMapData } from '@/types/types';
+import { DockBar } from '@components/dockBar';
 import { MapTab } from '@components/mapTab';
-import ChatContent from './[[...chatId]]/chat-content';
-import { DockBar } from '@/components/dockBar';
+import { Card } from '@/components/shadcn';
+import { useMediaStore } from '@store/media-devices';
+import { ApiKeyDialog } from '@/components/api-key-dialog';
+import Webcam from 'react-webcam';
+import { toast } from '@hooks/useToast';
 
 export default function Page() {
   const [showMap, setShowMap] = useState<boolean>(false);
@@ -15,6 +17,18 @@ export default function Page() {
   const [aiResponseData, setAiResponseData] = useState<AiResponseData | null>(
     null
   );
+  const [isWebcamError, setIsWebcamError] = useState<boolean>(false);
+
+  const webcamRef = useMediaStore((state) => state.ref);
+  const videoConstraints = useMediaStore((state) => state.baseVideoConstraints);
+
+  const capture = useCallback(() => {
+    if (webcamRef.current) {
+      console.log('Esta es la referencia', webcamRef.current);
+      const imageSrc = webcamRef.current.getScreenshot();
+      console.log(imageSrc);
+    }
+  }, [webcamRef]);
 
   useEffect(() => {
     switch (aiResponseData?.action) {
@@ -34,7 +48,7 @@ export default function Page() {
   };
 
   return (
-    <main className="w-full h-full flex">
+    <main className="w-full h-full flex p-4">
       {showMap && (
         <MapTab
           destination={mapDestination}
@@ -42,13 +56,27 @@ export default function Page() {
           onClose={onCloseMapTab}
         />
       )}
-      <div className="w-80 h-full max-h-full border-r-2 border-neutral-300 dark:border-neutral-700 overflow-auto">
-        <ChatList />
-      </div>
-      <div className="h-full flex-1 flex flex-col">
-        <ApiKeyDialog />
-        <ChatContent />
-      </div>
+      <Card className="mx-auto p-2 h-[800px] w-[650px]">
+        {isWebcamError && (
+          <div className="w-full h-full flex items-center justify-center bg-zinc-900/50 rounded-md">
+            <p>Error accessing camera</p>
+          </div>
+        )}
+        <Webcam
+          ref={webcamRef}
+          screenshotFormat="image/jpeg"
+          videoConstraints={videoConstraints}
+          onUserMediaError={() => {
+            setIsWebcamError(true);
+            toast({
+              variant: 'destructive',
+              description: 'Error accessing camera'
+            });
+          }}
+          className="rounded-md h-full"
+        />
+      </Card>
+      <ApiKeyDialog />
       <DockBar />
     </main>
   );
