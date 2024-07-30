@@ -6,7 +6,6 @@ import { cn } from "@lib/utils";
 
 import ImageSelection from "./image-selection";
 
-
 export default function ExpandingInput({
   onSubmit,
   onStop,
@@ -18,7 +17,7 @@ export default function ExpandingInput({
 }) {
   const [content, setContent] = useState("");
   const [selectedImage, setSelectedImage] = useState<File | undefined>(
-    undefined,
+    undefined
   );
 
   const submit = (value: string) => {
@@ -34,7 +33,7 @@ export default function ExpandingInput({
   const buttonDisabled = content.length === 0 || isStreaming;
 
   return (
-    <div className="w-full my-10">
+    <div>
       <form
         onSubmit={handleSubmit}
         className="w-full flex flex-col gap-y-4 px-4 relative max-w-5xl mx-auto"
@@ -62,7 +61,7 @@ export default function ExpandingInput({
           <button
             className={cn(
               "flex absolute right-0 bottom-0 px-1 py-1 mr-7 mb-2 dark:bg-white bg-black rounded-2xl z-10 w-10 h-10 items-center justify-center",
-              buttonDisabled && "opacity-50",
+              buttonDisabled && "opacity-50"
             )}
             disabled={buttonDisabled}
             type="submit"
