@@ -1,18 +1,14 @@
 'use client';
 
 import ChatList from './[[...chatId]]/chat-list';
-import { useAiStore } from '@/store/ai';
 import { useEffect, useState } from 'react';
-import { DialogForAPIKey } from '@components/api-key-dialog';
-import { useToast } from '@hooks/useToast';
+import { ApiKeyDialog } from '@components/api-key-dialog';
 import { AiActions, AiResponseData, OpenMapData } from '@/types/types';
 import { MapTab } from '@components/mapTab';
 import ChatContent from './[[...chatId]]/chat-content';
+import { DockBar } from '@/components/dockBar';
 
 export default function Page() {
-  // Let the user know with a toast to add API Key
-  const { toast } = useToast();
-  const apiKey = useAiStore((state) => state.apiKey);
   const [showMap, setShowMap] = useState<boolean>(false);
   const [mapDestination, setMapDestination] = useState<string>('');
   const [mapOrigin, setMapOrigin] = useState<string | undefined>('');
@@ -37,15 +33,6 @@ export default function Page() {
     setMapOrigin(undefined);
   };
 
-  useEffect(() => {
-    console.log('apiKey value:', apiKey);
-    if (!apiKey) {
-      toast({
-        description: 'Por favor añade tu API Key'
-      });
-    }
-  }, [apiKey]);
-
   return (
     <main className="w-full h-full flex">
       {showMap && (
@@ -59,9 +46,10 @@ export default function Page() {
         <ChatList />
       </div>
       <div className="h-full flex-1 flex flex-col">
-        <DialogForAPIKey />
+        <ApiKeyDialog />
         <ChatContent />
       </div>
+      <DockBar />
     </main>
   );
 }
