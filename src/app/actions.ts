@@ -1,48 +1,69 @@
-"use server";
+'use server';
 
 import {
   AiActions,
   AiRequestData,
   AiResponseData,
   OpenMapData
-} from "@/types/types";
-import { createOpenAI } from "@ai-sdk/openai";
-import { generateText } from "ai";
-import { z } from "zod";
+} from '@/types/types';
+import { createOpenAI } from '@ai-sdk/openai';
+import { generateText } from 'ai';
+import { z } from 'zod';
+
+export async function transcribeAudio(
+  apiKey: string,
+  audio: string
+): Promise<string> {
+  'use server';
+
+  const openai = createOpenAI({
+    apiKey,
+    compatibility: 'strict' // strict mode, enable when using the OpenAI API
+  });
+
+  const { text } = await generateText({
+    model: openai('whisper-1'),
+    messages: [{ role: 'user', content: audio }]
+  });
+
+  console.log(text);
+
+  return text;
+}
 
 export async function getAiResponse(
   apiKey: string,
   data: AiRequestData
 ): Promise<AiResponseData> {
-  "use server";
+  'use server';
 
   const { message, img } = data;
 
   const openai = createOpenAI({
     apiKey,
-    compatibility: "strict" // strict mode, enable when using the OpenAI API
+    compatibility: 'strict' // strict mode, enable when using the OpenAI API
   });
 
   const { text, toolResults } = await generateText({
-    model: openai("gpt-4o"),
-    system: "You are a helpful assistant.",
-    toolChoice: "required",
-    messages: [{ role: "user", content: message }],
+    model: openai('gpt-4o'),
+    system: 'You are a helpful assistant.',
+    toolChoice: 'required',
+    messages: [{ role: 'user', content: message }],
     tools: {
       other: {
-        description: "Use this tool when you need to answer any question",
+        description: 'Use this tool when you need to answer any question',
         parameters: z.object({
-          question: z.string().describe("The question to answer")
+          question: z.string().describe('The question to answer')
         }),
         execute: async ({ question }) => {
           return `Answering the question: ${question}`;
         }
       },
       navigation: {
-        description: "Use this tool to navigate to a specific location",
+        description: 'Use this tool to navigate to a specific location',
         parameters: z.object({
-          to: z.string().describe("The location to navigate to"),
-          from: z.string().optional().describe("The starting point")
+          to: z.string().describe('The location to navigate to'),
+          from: z.string().optional().describe('The starting point')
         }),
         execute: async ({ to, from }): Promise<OpenMapData> => {
           return {

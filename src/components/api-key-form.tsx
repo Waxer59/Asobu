@@ -18,6 +18,7 @@ import { z } from 'zod';
 
 import { useAiStore } from '@store/ai';
 import { useToast } from '@hooks/useToast';
+import { useEffect, useState } from 'react';
 
 const formSchema = z.object({
   apiKey: z.string()
@@ -32,22 +33,29 @@ export default function APIKeyForm() {
   });
   const { toast } = useToast();
   const setApiKey = useAiStore((state) => state.setApiKey);
+  const apiKey = useAiStore((state) => state.apiKey);
+
+  useEffect(() => {
+    if (apiKey) {
+      form.setValue('apiKey', apiKey);
+    }
+  }, [apiKey]);
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    const apiKey = values.apiKey;
+    const apiKeyInputValue = values.apiKey;
 
     toast({
       description: 'API Key saved'
     });
 
-    if (!apiKey.trim()) {
+    if (!apiKeyInputValue.trim()) {
       toast({
         description: 'API Key cannot be empty'
       });
       return;
     }
 
-    setApiKey(apiKey);
+    setApiKey(apiKeyInputValue);
   }
 
   return (
@@ -65,7 +73,7 @@ export default function APIKeyForm() {
                   Enter your OpenAI API Key
                 </FormLabel>
                 <FormControl>
-                  <Input placeholder="sk-..." {...field} />
+                  <Input placeholder="sk-..." {...field} type="password" />
                 </FormControl>
                 <FormMessage />
               </FormItem>

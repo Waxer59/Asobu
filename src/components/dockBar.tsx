@@ -1,3 +1,5 @@
+'use client';
+
 import {
   Tooltip,
   TooltipContent,
@@ -21,10 +23,81 @@ import {
   Wrench
 } from 'lucide-react';
 import Link from 'next/link';
+import { useEffect, useRef, useState } from 'react';
+import { Subtitles } from './subtitles';
+import { toast } from '@hooks/useToast';
+import { transcribeAudio } from '@/app/actions';
+import { useAiStore } from '@/store/ai';
+import { convertBlobToBase64 } from '@/lib/utils';
 
 export const DockBar = () => {
+  const [isRecording, setIsRecording] = useState<boolean>(false);
+  const mediaRecorder = useRef<MediaRecorder | null>(null);
+  const apiKey = useAiStore((state) => state.apiKey);
+
+  useEffect(() => {
+    record();
+  }, [isRecording]);
+
+  const getUserMicrophone = async (): Promise<MediaStream | null> => {
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      return await navigator.mediaDevices.getUserMedia({ audio: true });
+    }
+
+    toast({
+      title: 'Error',
+      description: 'Your browser does not support microphone access.',
+      variant: 'destructive'
+    });
+
+    return null;
+  };
+
+  const record = async () => {
+    const mic = await getUserMicrophone();
+
+    if (!isRecording || !mic) {
+      if (mediaRecorder.current) {
+        mediaRecorder.current.stop();
+      }
+
+      return;
+    }
+
+    const chunks: BlobPart[] = [];
+
+    mediaRecorder.current = new MediaRecorder(mic);
+    console.log('Recording...');
+    mediaRecorder.current.start();
+
+    mediaRecorder.current.ondataavailable = (e) => {
+      chunks.push(e.data);
+    };
+
+    mediaRecorder.current.onstop = async (e) => {
+      if (!apiKey) {
+        toast({
+          title: 'Error',
+          description: 'Please enter a valid API key.',
+          variant: 'destructive'
+        });
+        return;
+      }
+
+      const blob = new Blob(chunks, { type: 'audio/ogg; codecs=opus' });
+      const audioBase64 = await convertBlobToBase64(blob);
+      const text = await transcribeAudio(apiKey, audioBase64);
+      console.log(text);
+    };
+  };
+
+  const onMicrophoneClick = async () => {
+    setIsRecording(!isRecording);
+  };
+
   return (
-    <div className="bottom-3 absolute left-0 right-0 flex items-center gap-4 justify-center">
+    <div className="bottom-3 absolute left-0 right-0 flex flex-col items-center gap-4 justify-center">
+      <Subtitles />
       <Card className="flex justify-center gap-2 z-10 p-2 relative px-5">
         <TooltipProvider>
           <Tooltip>
@@ -55,19 +128,29 @@ export const DockBar = () => {
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button size="icon" variant="secondary" className="rounded-full">
+              <Button
+                size="icon"
+                variant={isRecording ? 'default' : 'secondary'}
+                className="rounded-full"
+                onClick={onMicrophoneClick}>
                 <Mic className="stroke-1" />
               </Button>
             </TooltipTrigger>
-            <TooltipContent>Talk to the AI</TooltipContent>
+            <TooltipContent>
+              {isRecording ? 'Recording...' : 'Talk to the AI'}
+            </TooltipContent>
           </Tooltip>
         </TooltipProvider>
+
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
               <Link
                 href="/teach-mode"
-                className={buttonVariants({ variant: 'ghost', size: 'icon' })}>
+                className={buttonVariants({
+                  variant: 'ghost',
+                  size: 'icon'
+                })}>
                 <Presentation className="stroke-1" />
               </Link>
             </TooltipTrigger>
