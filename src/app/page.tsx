@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { AiActions, AiResponseData, OpenMapData } from '@/types/types';
 import { DockBar } from '@components/dockBar';
-import { MapTab } from '@components/mapTab';
+import { MapTab } from '@components/MapTab';
 import { Card } from '@/components/shadcn';
 import { useMediaStore } from '@store/media-devices';
 import { ApiKeyDialog } from '@/components/api-key-dialog';
@@ -22,13 +22,13 @@ export default function Page() {
   const webcamRef = useMediaStore((state) => state.ref);
   const videoConstraints = useMediaStore((state) => state.baseVideoConstraints);
 
-  const capture = useCallback(() => {
-    if (webcamRef.current) {
-      console.log('Esta es la referencia', webcamRef.current);
-      const imageSrc = webcamRef.current.getScreenshot();
-      console.log(imageSrc);
-    }
-  }, [webcamRef]);
+  // const capture = useCallback(() => {
+  //   if (webcamRef.current) {
+  //     console.log('Esta es la referencia', webcamRef.current);
+  //     const imageSrc = webcamRef.current.getScreenshot();
+  //     console.log(imageSrc);
+  //   }
+  // }, [webcamRef]);
 
   useEffect(() => {
     switch (aiResponseData?.action) {

@@ -5,11 +5,12 @@ import { createRef, MutableRefObject } from 'react';
 
 interface State {
   baseVideoConstraints: WebcamProps['videoConstraints'];
-  file?: File | null;
+  CapturedImage?: string;
 }
 
 interface Actions {
   ref: MutableRefObject<null>;
+  setCapturedImage: (CapturedImage: string) => void;
 }
 
 const initialState: State = {
@@ -23,6 +24,9 @@ const initialState: State = {
 export const useMediaStore = create<State & Actions>()(
   devtools((set) => ({
     ...initialState,
-    ref: createRef<null>()
+    ref: createRef<null>(),
+    setCapturedImage: (CapturedImage) => {
+      set({ CapturedImage });
+    }
   }))
 );

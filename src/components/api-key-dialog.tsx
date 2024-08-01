@@ -3,6 +3,7 @@
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogTrigger
 } from '@components/shadcn/dialog';
 import { Key } from 'lucide-react';
@@ -57,6 +58,7 @@ export const ApiKeyDialog = () => {
           </Tooltip>
         </TooltipProvider>
         <DialogContent>
+          <DialogDescription></DialogDescription>
           <DialogTitle></DialogTitle>
           <APIKeyForm />
         </DialogContent>
