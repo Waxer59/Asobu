@@ -1,3 +1,5 @@
+'use client';
+
 import {
   Tooltip,
   TooltipContent,
@@ -18,11 +20,60 @@ import {
   Music,
   Navigation,
   Presentation,
-  Wrench
+  Wrench,
+  Camera
 } from 'lucide-react';
 import Link from 'next/link';
 
+import { useCallback, useEffect, useState } from 'react';
+import { useMediaStore } from '@store/media-devices';
+import { AiResponseData, AiRequestData } from '@/types/types';
+import { getAiResponse } from '@/app/actions';
+import { useAiStore } from '@/store/ai';
+
 export const DockBar = () => {
+  const [aiResponseData, setAiResponseData] = useState<AiResponseData | null>(
+    null
+  );
+  const [imageRef, setImageRef] = useState<string | null>(null);
+
+  const webcamRef = useMediaStore((state) => state.ref);
+
+  const capture = useCallback(() => {
+    if (webcamRef.current) {
+      const imageSrc = webcamRef.current.getScreenshot();
+      useMediaStore.setState({ CapturedImage: imageSrc });
+      setImageRef(imageSrc);
+    }
+  }, [webcamRef]);
+
+  const handleRequest = async () => {
+    const encodedImage = useMediaStore.getState().CapturedImage;
+    const ApiKey = useAiStore.getState().apiKey;
+
+    const data: AiRequestData = {
+      message: 'Analyze this image',
+      img: encodedImage as string
+    };
+    try {
+      const res = await getAiResponse(ApiKey as string, data);
+      console.log(res);
+      setAiResponseData(res);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    if (!useMediaStore.getState().CapturedImage)
+      console.log('no se ejecuto el efecto');
+    if (useMediaStore.getState().CapturedImage) {
+      console.log('se ejecuto el efecto');
+      handleRequest();
+      console.log(aiResponseData);
+    }
+  }, [imageRef]);
+
   return (
     <div className="bottom-3 absolute left-0 right-0 flex items-center gap-4 justify-center">
       <Card className="flex justify-center gap-2 z-10 p-2 relative px-5">
@@ -62,6 +113,22 @@ export const DockBar = () => {
             <TooltipContent>Talk to the AI</TooltipContent>
           </Tooltip>
         </TooltipProvider>
+
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                size="icon"
+                variant="ghost"
+                className="rounded-full"
+                onClick={capture}>
+                <Camera className="stroke-1" />
+                <TooltipContent>Camera</TooltipContent>
+              </Button>
+            </TooltipTrigger>
+          </Tooltip>
+        </TooltipProvider>
+
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>

@@ -18,6 +18,7 @@ import { z } from 'zod';
 
 import { useAiStore } from '@store/ai';
 import { useToast } from '@hooks/useToast';
+import { DialogContent } from '@radix-ui/react-dialog';
 
 const formSchema = z.object({
   apiKey: z.string()

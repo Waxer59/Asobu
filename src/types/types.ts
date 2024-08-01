@@ -3,7 +3,8 @@ export enum AiActions {
   OPEN_MAP,
   CLOSE_MAP,
   OPEN_TEACH_MODE,
-  CLOSE_TEACH_MODE
+  CLOSE_TEACH_MODE,
+  VISION
 }
 
 export interface OpenMapData {
@@ -20,5 +21,10 @@ export interface AiRequestData {
 export interface AiResponseData {
   text: string;
   action: AiActions;
-  data?: OpenMapData;
+  data?: OpenMapData | VisionData;
+}
+
+export interface VisionData {
+  text: string;
+  action: AiActions.VISION;
 }
