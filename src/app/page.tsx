@@ -3,28 +3,32 @@
 import { useCallback, useEffect, useState } from 'react';
 import { AiActions, AiResponseData, OpenMapData } from '@/types/types';
 import { DockBar } from '@components/dockBar';
-import { MapTab } from '@components/mapTab';
+import { Navigation } from '@/components/navigation';
 import { Card } from '@/components/shadcn';
 import { useMediaStore } from '@store/media-devices';
 import { ApiKeyDialog } from '@/components/api-key-dialog';
 import Webcam from 'react-webcam';
 import { toast } from '@hooks/useToast';
+import { useUiStore } from '@/store/ui';
 
 export default function Page() {
-  const [showMap, setShowMap] = useState<boolean>(false);
-  const [mapDestination, setMapDestination] = useState<string>('');
-  const [mapOrigin, setMapOrigin] = useState<string | undefined>('');
   const [aiResponseData, setAiResponseData] = useState<AiResponseData | null>(
     null
   );
   const [isWebcamError, setIsWebcamError] = useState<boolean>(false);
+  const navigationFrom = useUiStore((state) => state.navigationFrom);
+  const setNavigationFrom = useUiStore((state) => state.setNavigationFrom);
+  const navigationTo = useUiStore((state) => state.navigationTo);
+  const setNavigationTo = useUiStore((state) => state.setNavigationTo);
+  const isNavigationOpen = useUiStore((state) => state.isNavigationOpen);
+  const setIsNavigationOpen = useUiStore((state) => state.setIsNavigationOpen);
 
   const webcamRef = useMediaStore((state) => state.ref);
   const videoConstraints = useMediaStore((state) => state.baseVideoConstraints);
 
   const capture = useCallback(() => {
     if (webcamRef.current) {
-      console.log('Esta es la referencia', webcamRef.current);
+      // @ts-expect-error No types
       const imageSrc = webcamRef.current.getScreenshot();
       console.log(imageSrc);
     }
@@ -34,26 +38,26 @@ export default function Page() {
     switch (aiResponseData?.action) {
       case AiActions.OPEN_MAP:
         const { from, to } = aiResponseData.data as OpenMapData;
-        setShowMap(true);
-        setMapDestination(to);
-        setMapOrigin(from ?? undefined);
+        setIsNavigationOpen(true);
+        setNavigationTo(to);
+        setNavigationFrom(from ?? undefined);
         break;
     }
   }, [aiResponseData]);
 
-  const onCloseMapTab = () => {
-    setShowMap(false);
-    setMapDestination('');
-    setMapOrigin(undefined);
+  const onCloseNavigation = () => {
+    setIsNavigationOpen(false);
+    setNavigationTo('');
+    setNavigationFrom(undefined);
   };
 
   return (
     <main className="w-full h-full flex p-4">
-      {showMap && (
-        <MapTab
-          destination={mapDestination}
-          from={mapOrigin}
-          onClose={onCloseMapTab}
+      {isNavigationOpen && (
+        <Navigation
+          destination={navigationTo}
+          from={navigationFrom}
+          onClose={onCloseNavigation}
         />
       )}
       <Card className="mx-auto p-2 h-[800px] w-[650px]">

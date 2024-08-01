@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { devtools } from 'zustand/middleware';
+import { devtools, persist } from 'zustand/middleware';
 
 interface State {
   apiKey?: string;
@@ -18,16 +18,24 @@ const initialState: State = {
 };
 
 export const useAiStore = create<State & Actions>()(
-  devtools((set) => ({
-    ...initialState,
-    setApiKey: (apiKey) => {
-      set({ apiKey });
-    },
-    setResponse: (response) => {
-      set({ response });
-    },
-    clearResponse: () => {
-      set({ response: '' });
-    }
-  }))
+  devtools(
+    persist(
+      (set) => ({
+        ...initialState,
+        setApiKey: (apiKey) => {
+          set({ apiKey });
+        },
+        setResponse: (response) => {
+          set({ response });
+        },
+        clearResponse: () => {
+          set({ response: '' });
+        }
+      }),
+      {
+        name: 'ai-store',
+        partialize: (state) => ({ apiKey: state.apiKey })
+      }
+    )
+  )
 );

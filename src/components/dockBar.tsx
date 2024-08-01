@@ -29,6 +29,7 @@ import { toast } from '@hooks/useToast';
 import { transcribeAudio } from '@/app/actions';
 import { useAiStore } from '@/store/ai';
 import { convertBlobToBase64 } from '@/lib/utils';
+import { useUiStore } from '@/store/ui';
 
 export const DockBar = () => {
   const [isRecording, setIsRecording] = useState<boolean>(false);
@@ -38,6 +39,8 @@ export const DockBar = () => {
   useEffect(() => {
     record();
   }, [isRecording]);
+
+  const toggleNavigation = useUiStore((state) => state.toggleNavigation);
 
   const getUserMicrophone = async (): Promise<MediaStream | null> => {
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
@@ -67,7 +70,6 @@ export const DockBar = () => {
     const chunks: BlobPart[] = [];
 
     mediaRecorder.current = new MediaRecorder(mic);
-    console.log('Recording...');
     mediaRecorder.current.start();
 
     mediaRecorder.current.ondataavailable = (e) => {
@@ -84,11 +86,15 @@ export const DockBar = () => {
         return;
       }
 
-      const blob = new Blob(chunks, { type: 'audio/ogg; codecs=opus' });
+      const blob = new Blob(chunks, { type: 'audio/mp3' });
       const audioBase64 = await convertBlobToBase64(blob);
+      console.log(audioBase64);
       const text = await transcribeAudio(apiKey, audioBase64);
-      console.log(text);
     };
+  };
+
+  const onNavigationClick = async () => {
+    toggleNavigation();
   };
 
   const onMicrophoneClick = async () => {
@@ -189,7 +195,10 @@ export const DockBar = () => {
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button size="icon" variant="ghost">
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      onClick={onNavigationClick}>
                       <Navigation />
                     </Button>
                   </TooltipTrigger>

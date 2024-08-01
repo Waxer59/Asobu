@@ -8,27 +8,70 @@ import {
 } from '@/types/types';
 import { createOpenAI } from '@ai-sdk/openai';
 import { generateText } from 'ai';
+import OpenAI from 'openai';
 import { z } from 'zod';
+import fs from 'fs';
 
 export async function transcribeAudio(
   apiKey: string,
-  audio: string
-): Promise<string> {
+  base64Audio: string
+): Promise<string | null> {
   'use server';
 
-  const openai = createOpenAI({
-    apiKey,
-    compatibility: 'strict' // strict mode, enable when using the OpenAI API
+  const openai = new OpenAI({
+    apiKey: apiKey
   });
 
-  const { text } = await generateText({
-    model: openai('whisper-1'),
-    messages: [{ role: 'user', content: audio }]
+  const audio = Buffer.from(base64Audio.split('base64,')[1], 'base64');
+
+  const filePath = `tmp/${crypto.randomUUID()}.mp3`;
+
+  try {
+    fs.writeFileSync(filePath, audio);
+
+    const readStream = fs.createReadStream(filePath);
+
+    const { text } = await openai.audio.transcriptions.create({
+      file: readStream,
+      model: 'whisper-1'
+    });
+
+    // Remove the temporary file after successful processing
+    fs.unlinkSync(filePath);
+
+    console.log(text);
+    return text;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+}
+
+export async function textToSpeech(
+  apiKey: string,
+  text: string
+): Promise<Blob | null> {
+  'use server';
+
+  const openai = new OpenAI({
+    apiKey: apiKey
   });
 
-  console.log(text);
+  try {
+    const audio = await openai.audio.speech.create({
+      model: 'tts-1',
+      voice: 'echo',
+      input: text
+    });
 
-  return text;
+    console.log(audio);
+
+    //! CHANGE
+    return new Blob();
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
 }
 
 export async function getAiResponse(

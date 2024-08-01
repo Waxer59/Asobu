@@ -16,7 +16,7 @@ interface Props {
   onClose: () => void;
 }
 
-export const MapTab = ({ destination, from, onClose }: Props) => {
+export const Navigation = ({ destination, from, onClose }: Props) => {
   const [lat, setLat] = useState<number>(0);
   const [lng, setLng] = useState<number>(0);
   const watchID = useRef<number | null>(null);
@@ -83,7 +83,7 @@ export const MapTab = ({ destination, from, onClose }: Props) => {
 
   return (
     <Draggable nodeRef={dragRef} bounds="parent" cancel="#map">
-      <div ref={dragRef} className="absolute">
+      <div ref={dragRef} className="absolute z-50">
         <Card className="cursor-move p-7 flex items-center">
           <Button
             variant="ghost"
