@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { AiActions, AiResponseData, OpenMapData } from '@/types/types';
 import { DockBar } from '@components/dockBar';
 import { Navigation } from '@/components/navigation';
@@ -23,14 +23,13 @@ export default function Page() {
   const isNavigationOpen = useUiStore((state) => state.isNavigationOpen);
   const setIsNavigationOpen = useUiStore((state) => state.setIsNavigationOpen);
 
-  const webcamRef = useMediaStore((state) => state.ref);
+  const webcamRef = useRef<Webcam>(null);
+  const setWebcam = useMediaStore((state) => state.setWebcam);
   const videoConstraints = useMediaStore((state) => state.baseVideoConstraints);
 
-  const capture = useCallback(() => {
+  useEffect(() => {
     if (webcamRef.current) {
-      // @ts-expect-error No types
-      const imageSrc = webcamRef.current.getScreenshot();
-      console.log(imageSrc);
+      setWebcam(webcamRef.current);
     }
   }, [webcamRef]);
 

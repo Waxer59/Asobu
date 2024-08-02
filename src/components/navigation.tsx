@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import mapboxgl, { Map } from 'mapbox-gl';
-// @ts-expect-error no types file
+// @ts-expect-error No types file
 import MapboxDirections from '@mapbox/mapbox-gl-directions/dist/mapbox-gl-directions';
 import '@mapbox/mapbox-gl-directions/dist/mapbox-gl-directions.css';
 import { Card, Button } from '@shadcn/index';

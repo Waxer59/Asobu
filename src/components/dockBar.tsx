@@ -26,18 +26,23 @@ import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { Subtitles } from './subtitles';
 import { toast } from '@hooks/useToast';
-import { transcribeAudio } from '@/app/actions';
-import { useAiStore } from '@/store/ai';
-import { convertBlobToBase64 } from '@/lib/utils';
-import { useUiStore } from '@/store/ui';
+import { getAiResponse, textToSpeech, transcribeAudio } from '@/app/actions';
+import { useAiStore } from '@store/ai';
+import { useUiStore } from '@store/ui';
+import { convertBlobToBase64 } from '@lib/utils';
+import { useMediaStore } from '@/store/media-devices';
+import { OtherData } from '@/types/types';
 
 export const DockBar = () => {
   const [isRecording, setIsRecording] = useState<boolean>(false);
   const mediaRecorder = useRef<MediaRecorder | null>(null);
   const apiKey = useAiStore((state) => state.apiKey);
+  const setIsAiLoading = useAiStore((state) => state.setIsAiLoading);
+  const setResponse = useAiStore((state) => state.setResponse);
+  const webcam = useMediaStore((state) => state.webcam);
 
   useEffect(() => {
-    record();
+    startRecording();
   }, [isRecording]);
 
   const toggleNavigation = useUiStore((state) => state.toggleNavigation);
@@ -56,7 +61,7 @@ export const DockBar = () => {
     return null;
   };
 
-  const record = async () => {
+  const startRecording = async () => {
     const mic = await getUserMicrophone();
 
     if (!isRecording || !mic) {
@@ -66,6 +71,8 @@ export const DockBar = () => {
 
       return;
     }
+
+    setIsAiLoading(false);
 
     const chunks: BlobPart[] = [];
 
@@ -86,10 +93,36 @@ export const DockBar = () => {
         return;
       }
 
+      setIsAiLoading(true);
+
       const blob = new Blob(chunks, { type: 'audio/mp3' });
       const audioBase64 = await convertBlobToBase64(blob);
       const text = await transcribeAudio(apiKey, audioBase64);
-      console.log(text);
+
+      let imageBase64;
+
+      if (webcam) {
+        imageBase64 = webcam.getScreenshot() ?? undefined;
+      }
+
+      const { data } = await getAiResponse(apiKey, {
+        message: text ?? '',
+        img: imageBase64
+      });
+
+      const otherData = data as OtherData;
+
+      if (otherData.text) {
+        const base64Audio = await textToSpeech(apiKey, otherData.text);
+
+        const audio = new Audio(`data:audio/mp3;base64,${base64Audio}`);
+
+        audio.play();
+
+        setResponse(otherData.text);
+      }
+
+      setIsAiLoading(false);
     };
   };
 

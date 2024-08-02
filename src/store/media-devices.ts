@@ -1,18 +1,20 @@
+import Webcam from 'react-webcam';
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import type { WebcamProps } from 'react-webcam';
-import { createRef, MutableRefObject } from 'react';
 
 interface State {
-  baseVideoConstraints: WebcamProps['videoConstraints'];
-  file?: File | null;
+  baseVideoConstraints: MediaTrackConstraints;
+  webcam: Webcam | null;
 }
 
 interface Actions {
-  ref: MutableRefObject<null>;
+  setBaseVideoConstraints: (constraints: MediaTrackConstraints) => void;
+  setWebcam: (webcam: Webcam) => void;
+  clear: () => void;
 }
 
 const initialState: State = {
+  webcam: null,
   baseVideoConstraints: {
     width: 650,
     height: 800,
@@ -23,6 +25,9 @@ const initialState: State = {
 export const useMediaStore = create<State & Actions>()(
   devtools((set) => ({
     ...initialState,
-    ref: createRef<null>()
+    setBaseVideoConstraints: (constraints) =>
+      set({ baseVideoConstraints: constraints }),
+    setWebcam: (webcam) => set({ webcam }),
+    clear: () => set(initialState)
   }))
 );

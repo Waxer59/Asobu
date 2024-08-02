@@ -4,17 +4,20 @@ import { devtools, persist } from 'zustand/middleware';
 interface State {
   apiKey?: string;
   response?: string;
+  isAiLoading: boolean;
 }
 
 interface Actions {
   setApiKey: (apiKey: string) => void;
   setResponse: (response: string) => void;
+  setIsAiLoading: (isAiLoading: boolean) => void;
   clearResponse: () => void;
 }
 
 const initialState: State = {
   apiKey: '',
-  response: ''
+  response: '',
+  isAiLoading: false
 };
 
 export const useAiStore = create<State & Actions>()(
@@ -30,6 +33,9 @@ export const useAiStore = create<State & Actions>()(
         },
         clearResponse: () => {
           set({ response: '' });
+        },
+        setIsAiLoading: (isAiLoading) => {
+          set({ isAiLoading });
         }
       }),
       {

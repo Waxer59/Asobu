@@ -1,16 +1,18 @@
 'use server';
 
+import { arrayBufferToBase64 } from '@lib/utils';
 import {
   AiActions,
   AiRequestData,
+  AiResponse,
   AiResponseData,
-  OpenMapData
+  OpenMapData,
+  OtherData
 } from '@/types/types';
 import { createOpenAI } from '@ai-sdk/openai';
-import { generateText } from 'ai';
+import { generateText, UserContent } from 'ai';
 import OpenAI, { toFile } from 'openai';
 import { z } from 'zod';
-import fs from 'fs';
 
 export async function transcribeAudio(
   apiKey: string,
@@ -43,8 +45,10 @@ export async function transcribeAudio(
 export async function textToSpeech(
   apiKey: string,
   text: string
-): Promise<Blob | null> {
+): Promise<string | null> {
   'use server';
+
+  console.log(text);
 
   const openai = new OpenAI({
     apiKey: apiKey
@@ -57,10 +61,9 @@ export async function textToSpeech(
       input: text
     });
 
-    console.log(audio);
+    const arrayBuffer = await audio.arrayBuffer();
 
-    //! CHANGE
-    return new Blob();
+    return arrayBufferToBase64(arrayBuffer);
   } catch (error) {
     console.log(error);
     return null;
@@ -75,25 +78,37 @@ export async function getAiResponse(
 
   const { message, img } = data;
 
+  const content: UserContent = [{ type: 'text', text: message }];
+
+  if (img) {
+    content.push({ type: 'image', image: img });
+  }
+
   const openai = createOpenAI({
     apiKey,
     compatibility: 'strict' // strict mode, enable when using the OpenAI API
   });
 
-  const { text, toolResults } = await generateText({
+  const { toolResults } = await generateText({
     model: openai('gpt-4o'),
     system: 'You are a helpful assistant.',
     toolChoice: 'required',
-    messages: [{ role: 'user', content: message }],
+    messages: [
+      {
+        role: 'user',
+        content
+      }
+    ],
     tools: {
       other: {
         description: 'Use this tool when you need to answer any question',
         parameters: z.object({
-          question: z.string().describe('The question to answer')
+          answer: z.string().describe('The answer to the question')
         }),
-        execute: async ({ question }) => {
-          return `Answering the question: ${question}`;
-        }
+        execute: async ({ answer }): Promise<OtherData> => ({
+          text: answer,
+          action: AiActions.NONE
+        })
       },
       navigation: {
         description: 'Use this tool to navigate to a specific location',
@@ -113,8 +128,7 @@ export async function getAiResponse(
   });
 
   return {
-    text,
-    data: (toolResults[0].result as OpenMapData) ?? null,
-    action: (toolResults[0].result as OpenMapData).action ?? AiActions.NONE
+    data: (toolResults[0].result as AiResponse) ?? null,
+    action: (toolResults[0].result as AiResponse).action ?? AiActions.NONE
   };
 }
