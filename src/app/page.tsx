@@ -3,10 +3,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { AiActions, AiResponseData, OpenMapData } from '@/types/types';
 import { DockBar } from '@components/dockBar';
-import { Navigation } from '@/components/navigation';
-import { Card } from '@/components/shadcn';
+import { Navigation } from '@components/navigation';
+import { Card } from '@components/shadcn';
 import { useMediaStore } from '@store/media-devices';
-import { ApiKeyDialog } from '@/components/api-key-dialog';
+import { ApiKeyDialog } from '@components/api-key-dialog';
 import Webcam from 'react-webcam';
 import { toast } from '@hooks/useToast';
 import { useUiStore } from '@/store/ui';

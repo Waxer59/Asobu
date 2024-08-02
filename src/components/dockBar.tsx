@@ -20,7 +20,8 @@ import {
   Music,
   Navigation,
   Presentation,
-  Wrench
+  Wrench,
+  Camera
 } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
@@ -32,6 +33,12 @@ import { useUiStore } from '@store/ui';
 import { convertBlobToBase64 } from '@lib/utils';
 import { useMediaStore } from '@/store/media-devices';
 import { OtherData } from '@/types/types';
+
+import { useCallback, useEffect, useState } from 'react';
+import { useMediaStore } from '@store/media-devices';
+import { AiResponseData, AiRequestData } from '@/types/types';
+import { getAiResponse } from '@/app/actions';
+import { useAiStore } from '@/store/ai';
 
 export const DockBar = () => {
   const [isRecording, setIsRecording] = useState<boolean>(false);
@@ -180,7 +187,7 @@ export const DockBar = () => {
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
-
+        
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>

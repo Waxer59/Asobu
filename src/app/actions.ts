@@ -123,6 +123,18 @@ export async function getAiResponse(
             action: AiActions.OPEN_MAP
           };
         }
+      },
+      vision: {
+        description: 'Use this tool to analyze an image',
+        parameters: z.object({
+          description: z.string().describe('Description of the image')
+        }),
+        execute: async ({ description }): Promise<VisionData> => {
+          return {
+            text: description,
+            action: AiActions.VISION
+          };
+        }
       }
     }
   });

@@ -3,7 +3,8 @@ export enum AiActions {
   OPEN_MAP,
   CLOSE_MAP,
   OPEN_TEACH_MODE,
-  CLOSE_TEACH_MODE
+  CLOSE_TEACH_MODE,
+  VISION
 }
 
 export type AiResponse = OtherData | OpenMapData;
