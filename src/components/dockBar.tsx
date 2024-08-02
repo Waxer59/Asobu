@@ -20,8 +20,7 @@ import {
   Music,
   Navigation,
   Presentation,
-  Wrench,
-  Camera
+  Wrench
 } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
@@ -33,6 +32,8 @@ import { useUiStore } from '@store/ui';
 import { convertBlobToBase64 } from '@lib/utils';
 import { useMediaStore } from '@/store/media-devices';
 import { OtherData } from '@/types/types';
+import { usePathname } from 'next/navigation';
+import { PATHNAMES } from '@/constants/constants';
 
 export const DockBar = () => {
   const [isRecording, setIsRecording] = useState<boolean>(false);
@@ -41,6 +42,8 @@ export const DockBar = () => {
   const setIsAiLoading = useAiStore((state) => state.setIsAiLoading);
   const setResponse = useAiStore((state) => state.setResponse);
   const webcam = useMediaStore((state) => state.webcam);
+  const whiteBoardImage = useUiStore((state) => state.whiteBoardImage);
+  const pathname = usePathname();
 
   useEffect(() => {
     startRecording();
@@ -102,8 +105,15 @@ export const DockBar = () => {
 
       let imageBase64;
 
-      if (webcam) {
-        imageBase64 = webcam.getScreenshot() ?? undefined;
+      switch (pathname) {
+        case PATHNAMES.INDEX:
+          if (webcam) {
+            imageBase64 = webcam.getScreenshot() ?? undefined;
+          }
+          break;
+        case PATHNAMES.TEACH_MODE:
+          imageBase64 = whiteBoardImage;
+          break;
       }
 
       const { data } = await getAiResponse(apiKey, {
