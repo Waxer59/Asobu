@@ -34,12 +34,6 @@ import { convertBlobToBase64 } from '@lib/utils';
 import { useMediaStore } from '@/store/media-devices';
 import { OtherData } from '@/types/types';
 
-import { useCallback, useEffect, useState } from 'react';
-import { useMediaStore } from '@store/media-devices';
-import { AiResponseData, AiRequestData } from '@/types/types';
-import { getAiResponse } from '@/app/actions';
-import { useAiStore } from '@/store/ai';
-
 export const DockBar = () => {
   const [isRecording, setIsRecording] = useState<boolean>(false);
   const mediaRecorder = useRef<MediaRecorder | null>(null);
@@ -187,7 +181,7 @@ export const DockBar = () => {
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
-        
+
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
