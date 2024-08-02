@@ -7,6 +7,13 @@ export enum AiActions {
   VISION
 }
 
+export type AiResponse = OtherData | OpenMapData;
+
+export interface OtherData {
+  text: string;
+  action: AiActions.NONE;
+}
+
 export interface OpenMapData {
   from?: string;
   to: string;
@@ -19,12 +26,6 @@ export interface AiRequestData {
 }
 
 export interface AiResponseData {
-  text: string;
   action: AiActions;
-  data?: OpenMapData | VisionData;
-}
-
-export interface VisionData {
-  text: string;
-  action: AiActions.VISION;
+  data: AiResponse;
 }

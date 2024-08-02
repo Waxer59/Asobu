@@ -1,15 +1,74 @@
 'use server';
 
+import { arrayBufferToBase64 } from '@lib/utils';
 import {
   AiActions,
   AiRequestData,
+  AiResponse,
   AiResponseData,
   OpenMapData,
-  VisionData
+  OtherData
 } from '@/types/types';
 import { createOpenAI } from '@ai-sdk/openai';
-import { generateText } from 'ai';
+import { generateText, UserContent } from 'ai';
+import OpenAI, { toFile } from 'openai';
 import { z } from 'zod';
+
+export async function transcribeAudio(
+  apiKey: string,
+  base64Audio: string
+): Promise<string | null> {
+  'use server';
+
+  const openai = new OpenAI({
+    apiKey: apiKey
+  });
+
+  const audioBuffer = Buffer.from(base64Audio.split('base64,')[1], 'base64');
+
+  try {
+    const { text } = await openai.audio.transcriptions.create({
+      file: await toFile(audioBuffer, 'tmp.mp3', {
+        type: 'audio/mp3'
+      }),
+      model: 'whisper-1'
+    });
+
+    return text;
+  } catch (error) {
+    console.log(error);
+  }
+
+  return null;
+}
+
+export async function textToSpeech(
+  apiKey: string,
+  text: string
+): Promise<string | null> {
+  'use server';
+
+  console.log(text);
+
+  const openai = new OpenAI({
+    apiKey: apiKey
+  });
+
+  try {
+    const audio = await openai.audio.speech.create({
+      model: 'tts-1',
+      voice: 'echo',
+      input: text
+    });
+
+    const arrayBuffer = await audio.arrayBuffer();
+
+    return arrayBufferToBase64(arrayBuffer);
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+}
 
 export async function getAiResponse(
   apiKey: string,
@@ -19,33 +78,37 @@ export async function getAiResponse(
 
   const { message, img } = data;
 
+  const content: UserContent = [{ type: 'text', text: message }];
+
+  if (img) {
+    content.push({ type: 'image', image: img });
+  }
+
   const openai = createOpenAI({
     apiKey,
     compatibility: 'strict' // strict mode, enable when using the OpenAI API
   });
 
-  const { text, toolResults } = await generateText({
+  const { toolResults } = await generateText({
     model: openai('gpt-4o'),
     system: 'You are a helpful assistant.',
     toolChoice: 'required',
     messages: [
       {
         role: 'user',
-        content: [
-          { type: 'text', text: message },
-          { type: 'image', image: img ?? '' }
-        ]
+        content
       }
     ],
     tools: {
       other: {
         description: 'Use this tool when you need to answer any question',
         parameters: z.object({
-          question: z.string().describe('The question to answer')
+          answer: z.string().describe('The answer to the question')
         }),
-        execute: async ({ question }) => {
-          return `Answering the question: ${question}`;
-        }
+        execute: async ({ answer }): Promise<OtherData> => ({
+          text: answer,
+          action: AiActions.NONE
+        })
       },
       navigation: {
         description: 'Use this tool to navigate to a specific location',
@@ -72,31 +135,12 @@ export async function getAiResponse(
             action: AiActions.VISION
           };
         }
-        // messages: [
-        //   {
-        //     role: 'user',
-        //     content: [
-        //       {
-        //         type: 'text',
-        //         text:
-        //           `What’s in this image ${message}?` ?? 'What’s in this image?'
-        //       },
-        //       {
-        //         type: 'image',
-        //         image: img ?? ''
-        //       }
-        //     ]
-        //   }
-        // ]
       }
     }
   });
 
   return {
-    text,
-    data: (toolResults[0].result as OpenMapData | VisionData) ?? null,
-    action:
-      (toolResults[0].result as OpenMapData | VisionData).action ??
-      AiActions.NONE
+    data: (toolResults[0].result as AiResponse) ?? null,
+    action: (toolResults[0].result as AiResponse).action ?? AiActions.NONE
   };
 }
