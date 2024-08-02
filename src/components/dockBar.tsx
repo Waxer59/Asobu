@@ -88,8 +88,8 @@ export const DockBar = () => {
 
       const blob = new Blob(chunks, { type: 'audio/mp3' });
       const audioBase64 = await convertBlobToBase64(blob);
-      console.log(audioBase64);
       const text = await transcribeAudio(apiKey, audioBase64);
+      console.log(text);
     };
   };
 

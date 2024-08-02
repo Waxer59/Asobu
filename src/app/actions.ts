@@ -8,7 +8,7 @@ import {
 } from '@/types/types';
 import { createOpenAI } from '@ai-sdk/openai';
 import { generateText } from 'ai';
-import OpenAI from 'openai';
+import OpenAI, { toFile } from 'openai';
 import { z } from 'zod';
 import fs from 'fs';
 
@@ -22,25 +22,19 @@ export async function transcribeAudio(
     apiKey: apiKey
   });
 
-  const audio = Buffer.from(base64Audio.split('base64,')[1], 'base64');
-
-  const filePath = `tmp/${crypto.randomUUID()}.mp3`;
+  const audioBuffer = Buffer.from(base64Audio.split('base64,')[1], 'base64');
 
   try {
-    fs.writeFileSync(filePath, audio);
-
-    const readStream = fs.createReadStream(filePath);
-
     const { text } = await openai.audio.transcriptions.create({
-      file: readStream,
+      file: await toFile(audioBuffer, 'tmp.mp3', {
+        type: 'audio/mp3'
+      }),
       model: 'whisper-1'
     });
 
     return text;
   } catch (error) {
     console.log(error);
-  } finally {
-    fs.unlinkSync(filePath);
   }
 
   return null;
