@@ -36,15 +36,14 @@ export async function transcribeAudio(
       model: 'whisper-1'
     });
 
-    // Remove the temporary file after successful processing
-    fs.unlinkSync(filePath);
-
-    console.log(text);
     return text;
   } catch (error) {
     console.log(error);
-    return null;
+  } finally {
+    fs.unlinkSync(filePath);
   }
+
+  return null;
 }
 
 export async function textToSpeech(
