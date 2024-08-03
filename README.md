@@ -28,6 +28,48 @@ This project was developed by the following team members:
 
 Access Asobu's web interface through your browser to explore its diverse features, including music playback, navigation, translation, and more. The intuitive design allows you to seamlessly interact with the app, while voice commands enable hands-free operation for a more convenient experience. Simply speak your commands, and Asobu will respond, making it easy to discover how AI can enhance your daily activities.
 
+## Running the project on your local environment
+
+### Environment Variables
+
+Add a `.env` file in the root of the project with the following variables:
+
+```sh
+OPENAI_API_KEY=""
+SPOTIFY_CLIENT_ID=""
+SPOTIFY_CLIENT_SECRET=""
+NEXTAUTH_URL="url_of_your_app"
+NEXTAUTH_SECRET="hash_key"
+```
+
+To get the `NEXTAUTH_SECRET` you can run the following command:
+
+```sh
+openssl rand -base64 32
+```
+
+### Installation
+
+Clone the project from the repository:
+
+```sh
+git clone git@github.com:Waxer59/Asobu.git
+```
+
+Install the dependencies:
+
+```sh
+pnpm install
+```
+
+### Running the project
+
+Run the development server:
+
+```sh
+pnpm dev
+```
+
 ## Tech Stack
 
 - **Vercel AI SDK**: Core AI functionalities.
@@ -37,6 +79,7 @@ Access Asobu's web interface through your browser to explore its diverse feature
 - **Mapbox API**: Navigation and mapping services.
 - **OpenAI API**: Model used for all AI-powered features.
 - **Vercel**: Deployment platform for hosting the application.
+- **pnpm**: Package manager for managing dependencies.
 
 ## Participation in Midudev Hackathon 2024
 
