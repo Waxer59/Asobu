@@ -31,7 +31,12 @@ import { useAiStore } from '@store/ai';
 import { useUiStore } from '@store/ui';
 import { convertBlobToBase64 } from '@lib/utils';
 import { useMediaStore } from '@store/media-devices';
-import { AiActions, OpenMapData, OtherData } from '@/types/types';
+import {
+  AiActions,
+  OpenMapData,
+  OtherData,
+  TranslateData
+} from '@/types/types';
 import { usePathname, useRouter } from 'next/navigation';
 import { PATHNAMES } from '@/constants/constants';
 import { CoreMessage, UserContent } from 'ai';
@@ -55,12 +60,16 @@ export const DockBar = () => {
   const setIsTranslateOpen = useUiStore((state) => state.setIsTranslateOpen);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const router = useRouter();
-  const { startRecording, stopRecording, isRecording, alternateRecording } =
-    useMicrophone({
-      onGetChunks: (chunks) => {
-        sendToAi(chunks);
-      }
-    });
+  const { isRecording, alternateRecording } = useMicrophone({
+    onGetChunks: (chunks) => {
+      sendToAi(chunks);
+    }
+  });
+  const setLanguageOne = useUiStore((state) => state.setLanguageOne);
+  const setLanguageTwo = useUiStore((state) => state.setLanguageTwo);
+  const setLanguageOneText = useUiStore((state) => state.setLanguageOneText);
+  const setLanguageTwoText = useUiStore((state) => state.setLanguageTwoText);
+  const clearclearTranslate = useUiStore((state) => state.clearTranslate);
 
   useEffect(() => {
     audioRef.current = new Audio();
@@ -79,9 +88,6 @@ export const DockBar = () => {
   useEffect(() => {
     if (isRecording) {
       setPlayAudio(false);
-      startRecording();
-    } else {
-      stopRecording();
     }
   }, [isRecording]);
 
@@ -133,7 +139,6 @@ export const DockBar = () => {
     }
 
     const newHistory: CoreMessage[] = [
-      ...history,
       {
         role: 'user',
         content: newContent
@@ -160,7 +165,7 @@ export const DockBar = () => {
       case AiActions.OPEN_MAP:
         const { from, to } = data as OpenMapData;
         if (audioRef.current) {
-          audioRef.current.src = `data:audio/mp3;base64,${await textToSpeech(apiKey, 'I open the map for you')}`;
+          audioRef.current.src = `data:audio/mp3;base64,${await textToSpeech(apiKey, 'Opening the map')}`;
           setPlayAudio(true);
         }
 
@@ -171,7 +176,7 @@ export const DockBar = () => {
       case AiActions.CLOSE_MAP:
         clearNavigation();
         if (audioRef.current) {
-          audioRef.current.src = `data:audio/mp3;base64,${await textToSpeech(apiKey, 'I close the map')}`;
+          audioRef.current.src = `data:audio/mp3;base64,${await textToSpeech(apiKey, 'Closing the map')}`;
         }
         setPlayAudio(true);
         break;
@@ -201,6 +206,27 @@ export const DockBar = () => {
           }
           router.push(PATHNAMES.INDEX);
         });
+        break;
+      case AiActions.OPEN_TRANSLATE:
+        const { languageOne, languageTwo, text, translatedText } =
+          data as TranslateData;
+        if (audioRef.current) {
+          audioRef.current.src = `data:audio/mp3;base64,${await textToSpeech(apiKey, 'Opening the translator')}`;
+          setPlayAudio(true);
+        }
+
+        setIsTranslateOpen(true);
+        setLanguageOne(languageOne);
+        setLanguageTwo(languageTwo);
+        setLanguageOneText(text);
+        setLanguageTwoText(translatedText);
+        break;
+      case AiActions.CLOSE_TRANSLATE:
+        if (audioRef.current) {
+          audioRef.current.src = `data:audio/mp3;base64,${await textToSpeech(apiKey, 'Closing the translator')}`;
+          setPlayAudio(true);
+        }
+        clearclearTranslate();
         break;
     }
 

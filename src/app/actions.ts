@@ -7,12 +7,14 @@ import {
   AiResponse,
   AiResponseData,
   OpenMapData,
-  OtherData
+  OtherData,
+  TranslateData
 } from '@/types/types';
 import { createOpenAI } from '@ai-sdk/openai';
 import { CoreMessage, generateText } from 'ai';
 import OpenAI, { toFile } from 'openai';
 import { z } from 'zod';
+import { TRANSLATE_LANGUAGES } from '@/constants/constants';
 
 export async function translateText(
   apiKey: string,
@@ -161,6 +163,41 @@ export async function getAiResponse(
           parameters: z.object({}),
           execute: async (): Promise<ActionData> => ({
             action: AiActions.CLOSE_TEACH_MODE
+          })
+        },
+        translate: {
+          description: 'Use this tool to translate text',
+          parameters: z.object({
+            text: z.string().describe('The text to translate'),
+            translatedText: z.string().describe('The translated text'),
+            languageOne: z
+              .enum(TRANSLATE_LANGUAGES)
+              .describe(
+                'The language to translate from if its not provided put here the language that the person speaking'
+              ),
+            languageTwo: z
+              .enum(TRANSLATE_LANGUAGES)
+              .describe('The language to translate to')
+          }),
+          execute: async ({
+            text,
+            translatedText,
+            languageOne,
+            languageTwo
+          }): Promise<TranslateData> => ({
+            text,
+            translatedText,
+            languageOne,
+            languageTwo,
+            action: AiActions.OPEN_TRANSLATE
+          })
+        },
+        closeTranslate: {
+          description:
+            'Use this tool to close the translation, translator, or translate function.',
+          parameters: z.object({}),
+          execute: async (): Promise<ActionData> => ({
+            action: AiActions.CLOSE_TRANSLATE
           })
         }
       }

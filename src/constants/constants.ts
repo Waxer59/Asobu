@@ -62,4 +62,4 @@ export const TRANSLATE_LANGUAGES = [
   'Urdu',
   'Vietnamese',
   'Welsh'
-];
+] as const;
