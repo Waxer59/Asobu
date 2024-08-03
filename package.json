@@ -23,6 +23,7 @@
     "ai": "^3.2.37",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "hark": "^1.2.3",
     "lucide-react": "^0.417.0",
     "mapbox-gl": "^3.5.2",
     "next": "14.2.5",
@@ -43,6 +44,7 @@
     "zustand": "^4.5.4"
   },
   "devDependencies": {
+    "@types/hark": "^1.2.5",
     "@types/mapbox-gl": "^3.1.0",
     "@types/node": "^22.0.0",
     "@types/react": "^18.3.3",

@@ -7,7 +7,7 @@ export const Subtitles = () => {
 
   return (
     <div
-      className={`max-w-xl origin-bottom ${response?.trim() || isAiLoading ? 'block' : 'hidden'} bg-zinc-900/80 p-2 rounded-md`}>
+      className={`max-w-xl origin-bottom ${response?.trim() || isAiLoading ? 'block' : 'hidden'} bg-zinc-900/80 p-2 rounded-md z-10`}>
       {isAiLoading ? (
         <BeatLoader color="#f2f2f2" size={10} />
       ) : (
