@@ -2,15 +2,15 @@
 
 import { arrayBufferToBase64 } from '@lib/utils';
 import {
+  ActionData,
   AiActions,
-  AiRequestData,
   AiResponse,
   AiResponseData,
   OpenMapData,
   OtherData
 } from '@/types/types';
 import { createOpenAI } from '@ai-sdk/openai';
-import { CoreMessage, generateText, UserContent } from 'ai';
+import { CoreMessage, generateText } from 'ai';
 import OpenAI, { toFile } from 'openai';
 import { z } from 'zod';
 
@@ -108,6 +108,27 @@ export async function getAiResponse(
             action: AiActions.OPEN_MAP
           };
         }
+      },
+      closeNavigation: {
+        description: 'Use this tool to close the navigation or the map',
+        parameters: z.object({}),
+        execute: async (): Promise<ActionData> => ({
+          action: AiActions.CLOSE_MAP
+        })
+      },
+      openTeachMode: {
+        description: 'Use this tool to open the teach mode or whiteboard',
+        parameters: z.object({}),
+        execute: async (): Promise<ActionData> => ({
+          action: AiActions.OPEN_TEACH_MODE
+        })
+      },
+      closeTeachMode: {
+        description: 'Use this tool to close the teach mode or whiteboard',
+        parameters: z.object({}),
+        execute: async (): Promise<ActionData> => ({
+          action: AiActions.CLOSE_TEACH_MODE
+        })
       }
     }
   });

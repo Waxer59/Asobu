@@ -32,31 +32,33 @@ import { useUiStore } from '@store/ui';
 import { convertBlobToBase64 } from '@lib/utils';
 import { useMediaStore } from '@/store/media-devices';
 import { AiActions, OpenMapData, OtherData } from '@/types/types';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { PATHNAMES } from '@/constants/constants';
 import { CoreMessage, UserContent } from 'ai';
 import hark, { Harker } from 'hark';
 
 export const DockBar = () => {
   const [isRecording, setIsRecording] = useState<boolean>(false);
+  const [playAudio, setPlayAudio] = useState<boolean>(false);
+  const [chunks, setChunks] = useState<BlobPart[]>([]);
+  const [mic, setMic] = useState<MediaStream | null>(null);
+  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(
+    null
+  );
   const apiKey = useAiStore((state) => state.apiKey);
-  const setIsAiLoading = useAiStore((state) => state.setIsAiLoading);
   const history = useAiStore((state) => state.history);
+  const setIsAiLoading = useAiStore((state) => state.setIsAiLoading);
   const setHistory = useAiStore((state) => state.setHistory);
   const setResponse = useAiStore((state) => state.setResponse);
   const webcam = useMediaStore((state) => state.webcam);
   const whiteBoardImage = useUiStore((state) => state.whiteBoardImage);
+  const clearNavigation = useUiStore((state) => state.clearNavigation);
   const setIsNavigationOpen = useUiStore((state) => state.setIsNavigationOpen);
   const setNavigationTo = useUiStore((state) => state.setNavigationTo);
   const setNavigationFrom = useUiStore((state) => state.setNavigationFrom);
   const pathname = usePathname();
-  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(
-    null
-  );
-  const [chunks, setChunks] = useState<BlobPart[]>([]);
-  const [mic, setMic] = useState<MediaStream | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const [playAudio, setPlayAudio] = useState<boolean>(false);
+  const router = useRouter();
 
   useEffect(() => {
     getUserMicrophone();
@@ -186,6 +188,13 @@ export const DockBar = () => {
         setNavigationTo(to);
         setNavigationFrom(from ?? undefined);
         break;
+      case AiActions.CLOSE_MAP:
+        clearNavigation();
+        if (audioRef.current) {
+          audioRef.current.src = `data:audio/mp3;base64,${await textToSpeech(apiKey, 'I close the map')}`;
+        }
+        setPlayAudio(true);
+        break;
       case AiActions.NONE:
         const otherData = data as OtherData;
 
@@ -194,6 +203,25 @@ export const DockBar = () => {
           setPlayAudio(true);
           setResponse(otherData.text);
         }
+        break;
+      case AiActions.OPEN_TEACH_MODE:
+        textToSpeech(apiKey, 'Opening teach mode').then((res) => {
+          if (audioRef.current) {
+            audioRef.current.src = `data:audio/mp3;base64,${res}`;
+            setPlayAudio(true);
+          }
+          router.push(PATHNAMES.TEACH_MODE);
+        });
+        break;
+      case AiActions.CLOSE_TEACH_MODE:
+        textToSpeech(apiKey, 'Closing teach mode').then((res) => {
+          if (audioRef.current) {
+            audioRef.current.src = `data:audio/mp3;base64,${res}`;
+            setPlayAudio(true);
+          }
+          router.push(PATHNAMES.INDEX);
+        });
+        break;
     }
 
     setIsAiLoading(false);
@@ -245,7 +273,7 @@ export const DockBar = () => {
           <Tooltip>
             <TooltipTrigger asChild>
               <Link
-                href="/"
+                href={PATHNAMES.INDEX}
                 className={`${buttonVariants({ variant: 'ghost', size: 'icon' })} absolute -left-14`}>
                 <HomeIcon className="stroke-1" />
               </Link>
@@ -258,7 +286,7 @@ export const DockBar = () => {
           <Tooltip>
             <TooltipTrigger asChild>
               <Link
-                href="/chat"
+                href={PATHNAMES.CHAT}
                 className={buttonVariants({ variant: 'ghost', size: 'icon' })}>
                 <MessageCircle className="stroke-1" />
               </Link>
@@ -288,7 +316,7 @@ export const DockBar = () => {
           <Tooltip>
             <TooltipTrigger asChild>
               <Link
-                href="/teach-mode"
+                href={PATHNAMES.TEACH_MODE}
                 className={buttonVariants({
                   variant: 'ghost',
                   size: 'icon'

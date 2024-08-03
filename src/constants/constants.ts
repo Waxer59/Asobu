@@ -1,4 +1,5 @@
 export enum PATHNAMES {
   TEACH_MODE = '/teach-mode',
-  INDEX = '/'
+  INDEX = '/',
+  CHAT = '/chat'
 }

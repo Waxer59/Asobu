@@ -13,12 +13,9 @@ import { useUiStore } from '@/store/ui';
 export default function Page() {
   const [isWebcamError, setIsWebcamError] = useState<boolean>(false);
   const navigationFrom = useUiStore((state) => state.navigationFrom);
-  const setNavigationFrom = useUiStore((state) => state.setNavigationFrom);
   const navigationTo = useUiStore((state) => state.navigationTo);
-  const setNavigationTo = useUiStore((state) => state.setNavigationTo);
   const isNavigationOpen = useUiStore((state) => state.isNavigationOpen);
-  const setIsNavigationOpen = useUiStore((state) => state.setIsNavigationOpen);
-
+  const clearNavigation = useUiStore((state) => state.clearNavigation);
   const webcamRef = useRef<Webcam>(null);
   const setWebcam = useMediaStore((state) => state.setWebcam);
   const videoConstraints = useMediaStore((state) => state.baseVideoConstraints);
@@ -30,9 +27,7 @@ export default function Page() {
   }, [webcamRef]);
 
   const onCloseNavigation = () => {
-    setIsNavigationOpen(false);
-    setNavigationTo('');
-    setNavigationFrom(undefined);
+    clearNavigation();
   };
 
   return (

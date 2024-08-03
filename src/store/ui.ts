@@ -15,6 +15,7 @@ interface Actions {
   setNavigationTo: (to: string) => void;
   setWhiteBoardImage: (image: string) => void;
   clear: () => void;
+  clearNavigation: () => void;
 }
 
 const initialState: State = {
@@ -33,6 +34,12 @@ export const useUiStore = create<State & Actions>()(
     setNavigationFrom: (from) => set({ navigationFrom: from }),
     setNavigationTo: (to) => set({ navigationTo: to }),
     setWhiteBoardImage: (image) => set({ whiteBoardImage: image }),
-    clear: () => set(initialState)
+    clear: () => set(initialState),
+    clearNavigation: () =>
+      set({
+        navigationFrom: initialState.navigationFrom,
+        navigationTo: initialState.navigationTo,
+        isNavigationOpen: initialState.isNavigationOpen
+      })
   }))
 );
