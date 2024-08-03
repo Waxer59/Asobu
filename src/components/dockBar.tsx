@@ -32,6 +32,7 @@ import { useUiStore } from '@store/ui';
 import { convertBlobToBase64 } from '@lib/utils';
 import { useMediaStore } from '@/store/media-devices';
 import { OtherData } from '@/types/types';
+import { useSpotifyStore } from '@/store/spotify';
 import { usePathname } from 'next/navigation';
 import { PATHNAMES } from '@/constants/constants';
 import { CoreMessage, UserContent } from 'ai';
@@ -139,6 +140,9 @@ export const DockBar = () => {
       });
     }
 
+    const otherData = data;
+    //Refactor this to use a switch statement
+    useSpotifyStore.setState({ spotifyQuery: text });
     if (imageBase64) {
       newContent.push({
         type: 'image',
