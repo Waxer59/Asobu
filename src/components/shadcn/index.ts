@@ -8,3 +8,5 @@ export * from './toast';
 export * from './toaster';
 export * from './tooltip';
 export * from './collapsible';
+export * from './select';
+export * from './textarea';

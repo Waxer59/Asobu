@@ -23,79 +23,72 @@ import {
   Wrench
 } from 'lucide-react';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Subtitles } from './subtitles';
 import { toast } from '@hooks/useToast';
 import { getAiResponse, textToSpeech, transcribeAudio } from '@/app/actions';
 import { useAiStore } from '@store/ai';
 import { useUiStore } from '@store/ui';
 import { convertBlobToBase64 } from '@lib/utils';
-import { useMediaStore } from '@/store/media-devices';
-import { OtherData } from '@/types/types';
+import { useMediaStore } from '@store/media-devices';
+import {
+  AiActions,
+  OpenMapData,
+  OtherData,
+  TranslateData
+} from '@/types/types';
+import { usePathname, useRouter } from 'next/navigation';
 import { useSpotifyStore } from '@/store/spotify';
-import { usePathname } from 'next/navigation';
 import { PATHNAMES } from '@/constants/constants';
 import { CoreMessage, UserContent } from 'ai';
-import hark, { Harker } from 'hark';
+import { useMicrophone } from '@hooks/useMicrophone';
 
 export const DockBar = () => {
-  const [isRecording, setIsRecording] = useState<boolean>(false);
+  const [playAudio, setPlayAudio] = useState<boolean>(false);
   const apiKey = useAiStore((state) => state.apiKey);
-  const setIsAiLoading = useAiStore((state) => state.setIsAiLoading);
   const history = useAiStore((state) => state.history);
+  const setIsAiLoading = useAiStore((state) => state.setIsAiLoading);
   const setHistory = useAiStore((state) => state.setHistory);
   const setResponse = useAiStore((state) => state.setResponse);
   const webcam = useMediaStore((state) => state.webcam);
   const whiteBoardImage = useUiStore((state) => state.whiteBoardImage);
+  const clearNavigation = useUiStore((state) => state.clearNavigation);
+  const setIsNavigationOpen = useUiStore((state) => state.setIsNavigationOpen);
+  const setNavigationTo = useUiStore((state) => state.setNavigationTo);
+  const setNavigationFrom = useUiStore((state) => state.setNavigationFrom);
   const pathname = usePathname();
-  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(
-    null
-  );
-  const [chunks, setChunks] = useState<BlobPart[]>([]);
-  const [mic, setMic] = useState<MediaStream | null>(null);
+  const isTranslateOpen = useUiStore((state) => state.isTranslateOpen);
+  const setIsTranslateOpen = useUiStore((state) => state.setIsTranslateOpen);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const router = useRouter();
+  const { isRecording, alternateRecording } = useMicrophone({
+    onGetChunks: (chunks) => {
+      sendToAi(chunks);
+    }
+  });
+  const setLanguageOne = useUiStore((state) => state.setLanguageOne);
+  const setLanguageTwo = useUiStore((state) => state.setLanguageTwo);
+  const setLanguageOneText = useUiStore((state) => state.setLanguageOneText);
+  const setLanguageTwoText = useUiStore((state) => state.setLanguageTwoText);
+  const clearclearTranslate = useUiStore((state) => state.clearTranslate);
 
   useEffect(() => {
-    getUserMicrophone();
+    audioRef.current = new Audio();
   }, []);
 
   useEffect(() => {
-    if (!mic) return;
+    if (!audioRef.current) return;
 
-    setMediaRecorder(new MediaRecorder(mic));
-  }, [mic]);
-
-  useEffect(() => {
-    if (!chunks.length) return;
-    sendToAi(chunks);
-    setChunks([]);
-  }, [chunks]);
-
-  useEffect(() => {
-    if (!mediaRecorder) return;
-
-    mediaRecorder.ondataavailable = (e) => {
-      setChunks((prev) => [...prev, e.data]);
-    };
-  }, [mediaRecorder]);
-
-  useEffect(() => {
-    if (!mic || !mediaRecorder) return;
-
-    const harkValue: Harker = hark(mic);
-    harkValue.on('stopped_speaking', () => {
-      mediaRecorder.stop();
-    });
-
-    return () => {
-      harkValue?.stop();
-    };
-  }, [mediaRecorder, mic]);
+    if (playAudio) {
+      audioRef.current.play();
+    } else {
+      audioRef.current.pause();
+    }
+  }, [playAudio]);
 
   useEffect(() => {
     if (isRecording) {
-      startRecording();
-    } else {
-      mediaRecorder?.stop();
+      setPlayAudio(false);
     }
   }, [isRecording]);
 
@@ -111,7 +104,6 @@ export const DockBar = () => {
       return;
     }
 
-    setIsRecording(false);
     setIsAiLoading(true);
 
     const blob = new Blob(chunks, { type: 'audio/mp3' });
@@ -151,67 +143,106 @@ export const DockBar = () => {
     }
 
     const newHistory: CoreMessage[] = [
-      ...history,
       {
         role: 'user',
         content: newContent
       }
     ];
 
-    const { data } = await getAiResponse(apiKey, newHistory);
+    const response = await getAiResponse(apiKey, newHistory);
 
-    setHistory(newHistory);
-
-    const otherData = data as OtherData;
-
-    if (otherData.text) {
-      const base64Audio = await textToSpeech(apiKey, otherData.text);
-
-      const audio = new Audio(`data:audio/mp3;base64,${base64Audio}`);
-
-      audio.play();
-
-      setResponse(otherData.text);
-    }
-
-    setIsAiLoading(false);
-  };
-
-  const getUserMicrophone = async (): Promise<void> => {
-    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-      setMic(
-        await navigator.mediaDevices.getUserMedia({
-          audio: true
-        })
-      );
-    } else {
+    if (!response) {
+      setIsAiLoading(false);
       toast({
         title: 'Error',
-        description: 'Your browser does not support microphone access.',
-        variant: 'destructive'
-      });
-    }
-  };
-
-  const startRecording = async () => {
-    if (!mic || !mediaRecorder) {
-      toast({
-        title: 'Error',
-        description: 'Please allow microphone access.',
+        description: 'Something went wrong. Please try again.',
         variant: 'destructive'
       });
       return;
     }
 
-    mediaRecorder.start();
+    const { data } = response;
+
+    setHistory(newHistory);
+
+    switch (data.action) {
+      case AiActions.OPEN_MAP:
+        const { from, to } = data as OpenMapData;
+        if (audioRef.current) {
+          audioRef.current.src = `data:audio/mp3;base64,${await textToSpeech(apiKey, 'Opening the map')}`;
+          setPlayAudio(true);
+        }
+
+        setIsNavigationOpen(true);
+        setNavigationTo(to);
+        setNavigationFrom(from ?? undefined);
+        break;
+      case AiActions.CLOSE_MAP:
+        clearNavigation();
+        if (audioRef.current) {
+          audioRef.current.src = `data:audio/mp3;base64,${await textToSpeech(apiKey, 'Closing the map')}`;
+        }
+        setPlayAudio(true);
+        break;
+      case AiActions.NONE:
+        const otherData = data as OtherData;
+
+        if (otherData.text && audioRef.current) {
+          audioRef.current.src = `data:audio/mp3;base64,${await textToSpeech(apiKey, otherData.text)}`;
+          setPlayAudio(true);
+          setResponse(otherData.text);
+        }
+        break;
+      case AiActions.OPEN_TEACH_MODE:
+        textToSpeech(apiKey, 'Opening teach mode').then((res) => {
+          if (audioRef.current) {
+            audioRef.current.src = `data:audio/mp3;base64,${res}`;
+            setPlayAudio(true);
+          }
+          router.push(PATHNAMES.TEACH_MODE);
+        });
+        break;
+      case AiActions.CLOSE_TEACH_MODE:
+        textToSpeech(apiKey, 'Closing teach mode').then((res) => {
+          if (audioRef.current) {
+            audioRef.current.src = `data:audio/mp3;base64,${res}`;
+            setPlayAudio(true);
+          }
+          router.push(PATHNAMES.INDEX);
+        });
+        break;
+      case AiActions.OPEN_TRANSLATE:
+        const { languageOne, languageTwo, text, translatedText } =
+          data as TranslateData;
+        if (audioRef.current) {
+          audioRef.current.src = `data:audio/mp3;base64,${await textToSpeech(apiKey, 'Opening the translator')}`;
+          setPlayAudio(true);
+        }
+
+        setIsTranslateOpen(true);
+        setLanguageOne(languageOne);
+        setLanguageTwo(languageTwo);
+        setLanguageOneText(text);
+        setLanguageTwoText(translatedText);
+        break;
+      case AiActions.CLOSE_TRANSLATE:
+        if (audioRef.current) {
+          audioRef.current.src = `data:audio/mp3;base64,${await textToSpeech(apiKey, 'Closing the translator')}`;
+          setPlayAudio(true);
+        }
+        clearclearTranslate();
+        break;
+    }
+
+    setIsAiLoading(false);
   };
 
   const onNavigationClick = async () => {
     toggleNavigation();
   };
 
-  const onMicrophoneClick = async () => {
-    setIsRecording(!isRecording);
+  const onTranslateClick = async () => {
+    setIsTranslateOpen(!isTranslateOpen);
   };
 
   return (
@@ -222,7 +253,7 @@ export const DockBar = () => {
           <Tooltip>
             <TooltipTrigger asChild>
               <Link
-                href="/"
+                href={PATHNAMES.INDEX}
                 className={`${buttonVariants({ variant: 'ghost', size: 'icon' })} absolute -left-14`}>
                 <HomeIcon className="stroke-1" />
               </Link>
@@ -235,7 +266,7 @@ export const DockBar = () => {
           <Tooltip>
             <TooltipTrigger asChild>
               <Link
-                href="/chat"
+                href={PATHNAMES.CHAT}
                 className={buttonVariants({ variant: 'ghost', size: 'icon' })}>
                 <MessageCircle className="stroke-1" />
               </Link>
@@ -251,7 +282,7 @@ export const DockBar = () => {
                 size="icon"
                 variant={isRecording ? 'default' : 'secondary'}
                 className="rounded-full"
-                onClick={onMicrophoneClick}>
+                onClick={alternateRecording}>
                 <Mic className="stroke-1" />
               </Button>
             </TooltipTrigger>
@@ -265,7 +296,7 @@ export const DockBar = () => {
           <Tooltip>
             <TooltipTrigger asChild>
               <Link
-                href="/teach-mode"
+                href={PATHNAMES.TEACH_MODE}
                 className={buttonVariants({
                   variant: 'ghost',
                   size: 'icon'
@@ -298,7 +329,10 @@ export const DockBar = () => {
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button size="icon" variant="ghost">
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      onClick={onTranslateClick}>
                       <Languages />
                     </Button>
                   </TooltipTrigger>

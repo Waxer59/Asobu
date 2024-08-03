@@ -83,7 +83,7 @@ export const Navigation = ({ destination, from, onClose }: Props) => {
 
   return (
     <Draggable nodeRef={dragRef} bounds="parent" cancel="#map">
-      <div ref={dragRef} className="absolute z-50">
+      <div ref={dragRef} className="absolute z-50 top-0">
         <Card className="cursor-move p-7 flex items-center">
           <Button
             variant="ghost"
