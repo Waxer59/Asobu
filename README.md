@@ -10,8 +10,8 @@ Asobu, derived from the Japanese word for "play," is a project that explores the
 
 This project was developed by the following team members:
 
-- [@dreyfus92](www.github.com/dreyfus92)
-- [@Waxer59](www.github.com/Waxer59)
+- [@dreyfus92](https://github.com/dreyfus92)
+- [@Waxer59](https://github.com/Waxer59)
 
 ## Features
 
