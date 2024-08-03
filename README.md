@@ -35,7 +35,7 @@ Access Asobu's web interface through your browser to explore its diverse feature
 Add a `.env` file in the root of the project with the following variables:
 
 ```sh
-OPENAI_API_KEY=""
+NEXT_PUBLIC_MAPBOX_TOKEN=""
 SPOTIFY_CLIENT_ID=""
 SPOTIFY_CLIENT_SECRET=""
 NEXTAUTH_URL="url_of_your_app"
