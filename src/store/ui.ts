@@ -3,8 +3,9 @@ import { devtools } from 'zustand/middleware';
 
 interface State {
   isNavigationOpen: boolean;
-  navigationFrom: string | undefined;
+  navigationFrom?: string;
   navigationTo: string;
+  whiteBoardImage: string;
 }
 
 interface Actions {
@@ -12,12 +13,15 @@ interface Actions {
   setIsNavigationOpen: (isOpen: boolean) => void;
   setNavigationFrom: (from: string | undefined) => void;
   setNavigationTo: (to: string) => void;
+  setWhiteBoardImage: (image: string) => void;
+  clear: () => void;
 }
 
 const initialState: State = {
   isNavigationOpen: false,
   navigationFrom: undefined,
-  navigationTo: ''
+  navigationTo: '',
+  whiteBoardImage: ''
 };
 
 export const useUiStore = create<State & Actions>()(
@@ -27,6 +31,8 @@ export const useUiStore = create<State & Actions>()(
       set((state) => ({ isNavigationOpen: !state.isNavigationOpen })),
     setIsNavigationOpen: (isOpen) => set({ isNavigationOpen: isOpen }),
     setNavigationFrom: (from) => set({ navigationFrom: from }),
-    setNavigationTo: (to) => set({ navigationTo: to })
+    setNavigationTo: (to) => set({ navigationTo: to }),
+    setWhiteBoardImage: (image) => set({ whiteBoardImage: image }),
+    clear: () => set(initialState)
   }))
 );

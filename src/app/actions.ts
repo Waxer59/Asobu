@@ -11,7 +11,7 @@ import {
   SpotifySearch
 } from '@/types/types';
 import { createOpenAI } from '@ai-sdk/openai';
-import { generateText, UserContent } from 'ai';
+import { CoreMessage, generateText, UserContent } from 'ai';
 import OpenAI, { toFile } from 'openai';
 import { z } from 'zod';
 
@@ -49,8 +49,6 @@ export async function textToSpeech(
 ): Promise<string | null> {
   'use server';
 
-  console.log(text);
-
   const openai = new OpenAI({
     apiKey: apiKey
   });
@@ -73,17 +71,9 @@ export async function textToSpeech(
 
 export async function getAiResponse(
   apiKey: string,
-  data: AiRequestData
+  history: CoreMessage[]
 ): Promise<AiResponseData> {
   'use server';
-
-  const { message, img } = data;
-
-  const content: UserContent = [{ type: 'text', text: message }];
-
-  if (img) {
-    content.push({ type: 'image', image: img });
-  }
 
   const openai = createOpenAI({
     apiKey,
@@ -94,12 +84,7 @@ export async function getAiResponse(
     model: openai('gpt-4o'),
     system: 'You are a helpful assistant.',
     toolChoice: 'required',
-    messages: [
-      {
-        role: 'user',
-        content
-      }
-    ],
+    messages: [...history],
     tools: {
       other: {
         description: 'Use this tool when you need to answer any question',

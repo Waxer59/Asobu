@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { AiActions, AiResponseData, OpenMapData } from '@/types/types';
 import { DockBar } from '@components/dockBar';
 import { Navigation } from '@components/navigation';
 import { Card } from '@components/shadcn';
@@ -14,9 +13,6 @@ import { SessionProvider } from 'next-auth/react';
 import SpotifyWidget from '@/components/spotify-widget';
 
 export default function Page() {
-  const [aiResponseData, setAiResponseData] = useState<AiResponseData | null>(
-    null
-  );
   const [isWebcamError, setIsWebcamError] = useState<boolean>(false);
   const navigationFrom = useUiStore((state) => state.navigationFrom);
   const setNavigationFrom = useUiStore((state) => state.setNavigationFrom);
@@ -34,17 +30,6 @@ export default function Page() {
       setWebcam(webcamRef.current);
     }
   }, [webcamRef]);
-
-  useEffect(() => {
-    switch (aiResponseData?.action) {
-      case AiActions.OPEN_MAP:
-        const { from, to } = aiResponseData.data as OpenMapData;
-        setIsNavigationOpen(true);
-        setNavigationTo(to);
-        setNavigationFrom(from ?? undefined);
-        break;
-    }
-  }, [aiResponseData]);
 
   const onCloseNavigation = () => {
     setIsNavigationOpen(false);
