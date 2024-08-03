@@ -18,7 +18,7 @@ import { z } from 'zod';
 
 import { useAiStore } from '@store/ai';
 import { useToast } from '@hooks/useToast';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 const formSchema = z.object({
   apiKey: z.string()

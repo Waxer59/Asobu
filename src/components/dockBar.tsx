@@ -23,7 +23,7 @@ import {
   Wrench
 } from 'lucide-react';
 import Link from 'next/link';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Subtitles } from './subtitles';
 import { toast } from '@hooks/useToast';
 import { getAiResponse, textToSpeech, transcribeAudio } from '@/app/actions';
@@ -34,107 +34,172 @@ import { useMediaStore } from '@/store/media-devices';
 import { OtherData } from '@/types/types';
 import { usePathname } from 'next/navigation';
 import { PATHNAMES } from '@/constants/constants';
+import { CoreMessage, UserContent } from 'ai';
+import hark, { Harker } from 'hark';
 
 export const DockBar = () => {
   const [isRecording, setIsRecording] = useState<boolean>(false);
-  const mediaRecorder = useRef<MediaRecorder | null>(null);
   const apiKey = useAiStore((state) => state.apiKey);
   const setIsAiLoading = useAiStore((state) => state.setIsAiLoading);
+  const history = useAiStore((state) => state.history);
+  const setHistory = useAiStore((state) => state.setHistory);
   const setResponse = useAiStore((state) => state.setResponse);
   const webcam = useMediaStore((state) => state.webcam);
   const whiteBoardImage = useUiStore((state) => state.whiteBoardImage);
   const pathname = usePathname();
+  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(
+    null
+  );
+  const [chunks, setChunks] = useState<BlobPart[]>([]);
+  const [mic, setMic] = useState<MediaStream | null>(null);
 
   useEffect(() => {
-    startRecording();
+    getUserMicrophone();
+  }, []);
+
+  useEffect(() => {
+    if (!mic) return;
+
+    setMediaRecorder(new MediaRecorder(mic));
+  }, [mic]);
+
+  useEffect(() => {
+    if (!chunks.length) return;
+    sendToAi(chunks);
+    setChunks([]);
+  }, [chunks]);
+
+  useEffect(() => {
+    if (!mediaRecorder) return;
+
+    mediaRecorder.ondataavailable = (e) => {
+      setChunks((prev) => [...prev, e.data]);
+    };
+  }, [mediaRecorder]);
+
+  useEffect(() => {
+    if (!mic || !mediaRecorder) return;
+
+    const harkValue: Harker = hark(mic);
+    harkValue.on('stopped_speaking', () => {
+      mediaRecorder.stop();
+    });
+
+    return () => {
+      harkValue?.stop();
+    };
+  }, [mediaRecorder, mic]);
+
+  useEffect(() => {
+    if (isRecording) {
+      startRecording();
+    } else {
+      mediaRecorder?.stop();
+    }
   }, [isRecording]);
 
   const toggleNavigation = useUiStore((state) => state.toggleNavigation);
 
-  const getUserMicrophone = async (): Promise<MediaStream | null> => {
-    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-      return await navigator.mediaDevices.getUserMedia({ audio: true });
-    }
-
-    toast({
-      title: 'Error',
-      description: 'Your browser does not support microphone access.',
-      variant: 'destructive'
-    });
-
-    return null;
-  };
-
-  const startRecording = async () => {
-    const mic = await getUserMicrophone();
-
-    if (!isRecording || !mic) {
-      if (mediaRecorder.current) {
-        mediaRecorder.current.stop();
-      }
-
+  const sendToAi = async (chunks: BlobPart[]) => {
+    if (!apiKey) {
+      toast({
+        title: 'Error',
+        description: 'Please enter a valid API key.',
+        variant: 'destructive'
+      });
       return;
     }
 
-    setIsAiLoading(false);
+    setIsRecording(false);
+    setIsAiLoading(true);
 
-    const chunks: BlobPart[] = [];
+    const blob = new Blob(chunks, { type: 'audio/mp3' });
+    const audioBase64 = await convertBlobToBase64(blob);
+    const text = await transcribeAudio(apiKey, audioBase64);
 
-    mediaRecorder.current = new MediaRecorder(mic);
-    mediaRecorder.current.start();
+    let imageBase64;
 
-    mediaRecorder.current.ondataavailable = (e) => {
-      chunks.push(e.data);
-    };
+    switch (pathname) {
+      case PATHNAMES.INDEX:
+        if (webcam) {
+          imageBase64 = webcam.getScreenshot() ?? undefined;
+        }
+        break;
+      case PATHNAMES.TEACH_MODE:
+        imageBase64 = whiteBoardImage;
+        break;
+    }
 
-    mediaRecorder.current.onstop = async (e) => {
-      if (!apiKey) {
-        toast({
-          title: 'Error',
-          description: 'Please enter a valid API key.',
-          variant: 'destructive'
-        });
-        return;
-      }
+    const newContent: UserContent = [];
 
-      setIsAiLoading(true);
-
-      const blob = new Blob(chunks, { type: 'audio/mp3' });
-      const audioBase64 = await convertBlobToBase64(blob);
-      const text = await transcribeAudio(apiKey, audioBase64);
-
-      let imageBase64;
-
-      switch (pathname) {
-        case PATHNAMES.INDEX:
-          if (webcam) {
-            imageBase64 = webcam.getScreenshot() ?? undefined;
-          }
-          break;
-        case PATHNAMES.TEACH_MODE:
-          imageBase64 = whiteBoardImage;
-          break;
-      }
-
-      const { data } = await getAiResponse(apiKey, {
-        message: text ?? '',
-        img: imageBase64
+    if (text) {
+      newContent.push({
+        type: 'text',
+        text
       });
+    }
 
-      const otherData = data as OtherData;
+    if (imageBase64) {
+      newContent.push({
+        type: 'image',
+        image: imageBase64
+      });
+    }
 
-      if (otherData.text) {
-        const base64Audio = await textToSpeech(apiKey, otherData.text);
-
-        const audio = new Audio(`data:audio/mp3;base64,${base64Audio}`);
-
-        audio.play();
-
-        setResponse(otherData.text);
+    const newHistory: CoreMessage[] = [
+      ...history,
+      {
+        role: 'user',
+        content: newContent
       }
+    ];
 
-      setIsAiLoading(false);
-    };
+    const { data } = await getAiResponse(apiKey, newHistory);
+
+    setHistory(newHistory);
+
+    const otherData = data as OtherData;
+
+    if (otherData.text) {
+      const base64Audio = await textToSpeech(apiKey, otherData.text);
+
+      const audio = new Audio(`data:audio/mp3;base64,${base64Audio}`);
+
+      audio.play();
+
+      setResponse(otherData.text);
+    }
+
+    setIsAiLoading(false);
+  };
+
+  const getUserMicrophone = async (): Promise<void> => {
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      setMic(
+        await navigator.mediaDevices.getUserMedia({
+          audio: true
+        })
+      );
+    } else {
+      toast({
+        title: 'Error',
+        description: 'Your browser does not support microphone access.',
+        variant: 'destructive'
+      });
+    }
+  };
+
+  const startRecording = async () => {
+    if (!mic || !mediaRecorder) {
+      toast({
+        title: 'Error',
+        description: 'Please allow microphone access.',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    mediaRecorder.start();
   };
 
   const onNavigationClick = async () => {
