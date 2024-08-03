@@ -84,3 +84,7 @@ pnpm dev
 ## Participation in Midudev Hackathon 2024
 
 This project was created for the Midudev Hackathon 2024, which challenges developers to build innovative applications using the Vercel AI SDK. For more information on the hackathon, please visit the [official page](https://github.com/midudev/hackaton-vercel-2024).
+
+## License
+
+This project is open-source and available under the [MIT License](LICENSE).
