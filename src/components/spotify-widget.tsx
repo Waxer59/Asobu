@@ -6,7 +6,9 @@ import { useEffect, useState } from 'react';
 import { AuthResponse } from '@/types/types';
 import { Button } from '@components/shadcn/button';
 import SpotifyPlayer from 'react-spotify-web-playback';
-import { set } from 'zod';
+import { getAiResponse } from '@/app/actions';
+import { useAiStore } from '@/store/ai';
+import { useSpotifyStore } from '@/store/spotify';
 
 export default function SpotifyWidget() {
   const { data } = useSession();
@@ -14,7 +16,8 @@ export default function SpotifyWidget() {
   const authSession = data as AuthResponse;
   const token = authSession?.token.access_token;
   console.log(token);
-  const query = 'Cita en el quirofano de Panda';
+  let query = useSpotifyStore.getState().spotifyQuery;
+  console.log(query);
   const [URI, setURI] = useState<string | null>(null);
 
   useEffect(() => {
@@ -27,7 +30,7 @@ export default function SpotifyWidget() {
     };
 
     fetchSong();
-  });
+  }, [query]);
 
   return (
     <div>
@@ -45,7 +48,7 @@ export default function SpotifyWidget() {
         </svg>
       </Button>
       <div className="absolute bottom-40 right-10">
-        {token && (
+        {token && useSpotifyStore.getState().isSpotifyOpen && (
           <SpotifyPlayer
             token={token}
             uris={URI ? [URI] : []}

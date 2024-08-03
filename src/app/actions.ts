@@ -7,7 +7,8 @@ import {
   AiResponse,
   AiResponseData,
   OpenMapData,
-  OtherData
+  OtherData,
+  SpotifySearch
 } from '@/types/types';
 import { createOpenAI } from '@ai-sdk/openai';
 import { generateText, UserContent } from 'ai';
@@ -121,6 +122,18 @@ export async function getAiResponse(
             to,
             from,
             action: AiActions.OPEN_MAP
+          };
+        }
+      },
+      spotify: {
+        description: 'Use this tool to play a song',
+        parameters: z.object({
+          query: z.string().describe('The song to play')
+        }),
+        execute: async ({ query }): Promise<SpotifySearch> => {
+          return {
+            text: query,
+            action: AiActions.SPOTIFY_SEARCH
           };
         }
       }

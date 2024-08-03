@@ -33,6 +33,7 @@ import { useUiStore } from '@store/ui';
 import { convertBlobToBase64 } from '@lib/utils';
 import { useMediaStore } from '@/store/media-devices';
 import { OtherData } from '@/types/types';
+import { useSpotifyStore } from '@/store/spotify';
 
 export const DockBar = () => {
   const [isRecording, setIsRecording] = useState<boolean>(false);
@@ -111,7 +112,9 @@ export const DockBar = () => {
         img: imageBase64
       });
 
-      const otherData = data as OtherData;
+      const otherData = data;
+      //Refactor this to use a switch statement
+      useSpotifyStore.setState({ spotifyQuery: text });
 
       if (otherData.text) {
         const base64Audio = await textToSpeech(apiKey, otherData.text);
