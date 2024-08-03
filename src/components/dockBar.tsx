@@ -31,7 +31,7 @@ import { useAiStore } from '@store/ai';
 import { useUiStore } from '@store/ui';
 import { convertBlobToBase64 } from '@lib/utils';
 import { useMediaStore } from '@/store/media-devices';
-import { OtherData } from '@/types/types';
+import { AiActions, OpenMapData, OtherData } from '@/types/types';
 import { usePathname } from 'next/navigation';
 import { PATHNAMES } from '@/constants/constants';
 import { CoreMessage, UserContent } from 'ai';
@@ -46,20 +46,26 @@ export const DockBar = () => {
   const setResponse = useAiStore((state) => state.setResponse);
   const webcam = useMediaStore((state) => state.webcam);
   const whiteBoardImage = useUiStore((state) => state.whiteBoardImage);
+  const setIsNavigationOpen = useUiStore((state) => state.setIsNavigationOpen);
+  const setNavigationTo = useUiStore((state) => state.setNavigationTo);
+  const setNavigationFrom = useUiStore((state) => state.setNavigationFrom);
   const pathname = usePathname();
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(
     null
   );
   const [chunks, setChunks] = useState<BlobPart[]>([]);
   const [mic, setMic] = useState<MediaStream | null>(null);
-  const audioRef = useRef<HTMLAudioElement>(new Audio());
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const [playAudio, setPlayAudio] = useState<boolean>(false);
 
   useEffect(() => {
     getUserMicrophone();
+    audioRef.current = new Audio();
   }, []);
 
   useEffect(() => {
+    if (!audioRef.current) return;
+
     if (playAudio) {
       audioRef.current.play();
     } else {
@@ -168,14 +174,26 @@ export const DockBar = () => {
 
     setHistory(newHistory);
 
-    const otherData = data as OtherData;
+    switch (data.action) {
+      case AiActions.OPEN_MAP:
+        const { from, to } = data as OpenMapData;
+        if (audioRef.current) {
+          audioRef.current.src = `data:audio/mp3;base64,${await textToSpeech(apiKey, 'I open the map for you')}`;
+          setPlayAudio(true);
+        }
 
-    if (otherData.text) {
-      const base64Audio = await textToSpeech(apiKey, otherData.text);
+        setIsNavigationOpen(true);
+        setNavigationTo(to);
+        setNavigationFrom(from ?? undefined);
+        break;
+      case AiActions.NONE:
+        const otherData = data as OtherData;
 
-      audioRef.current.src = `data:audio/mp3;base64,${base64Audio}`;
-      setPlayAudio(true);
-      setResponse(otherData.text);
+        if (otherData.text && audioRef.current) {
+          audioRef.current.src = `data:audio/mp3;base64,${await textToSpeech(apiKey, otherData.text)}`;
+          setPlayAudio(true);
+          setResponse(otherData.text);
+        }
     }
 
     setIsAiLoading(false);
