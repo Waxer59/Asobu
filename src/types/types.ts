@@ -29,3 +29,26 @@ export interface AiResponseData {
   action: AiActions;
   data: AiResponse;
 }
+
+export type User = {
+  name: string;
+  email: string;
+  image: string;
+};
+
+export type Token = {
+  name: string;
+  email: string;
+  picture: string;
+  sub: string;
+  access_token: string;
+  iat: number;
+  exp: number;
+  jti: string;
+};
+
+export type AuthResponse = {
+  user: User;
+  expires: string;
+  token: Token;
+};
