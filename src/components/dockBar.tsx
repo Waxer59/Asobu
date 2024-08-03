@@ -23,7 +23,7 @@ import {
   Wrench
 } from 'lucide-react';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Subtitles } from './subtitles';
 import { toast } from '@hooks/useToast';
 import { getAiResponse, textToSpeech, transcribeAudio } from '@/app/actions';
@@ -52,10 +52,20 @@ export const DockBar = () => {
   );
   const [chunks, setChunks] = useState<BlobPart[]>([]);
   const [mic, setMic] = useState<MediaStream | null>(null);
+  const audioRef = useRef<HTMLAudioElement>(new Audio());
+  const [playAudio, setPlayAudio] = useState<boolean>(false);
 
   useEffect(() => {
     getUserMicrophone();
   }, []);
+
+  useEffect(() => {
+    if (playAudio) {
+      audioRef.current.play();
+    } else {
+      audioRef.current.pause();
+    }
+  }, [playAudio]);
 
   useEffect(() => {
     if (!mic) return;
@@ -163,10 +173,8 @@ export const DockBar = () => {
     if (otherData.text) {
       const base64Audio = await textToSpeech(apiKey, otherData.text);
 
-      const audio = new Audio(`data:audio/mp3;base64,${base64Audio}`);
-
-      audio.play();
-
+      audioRef.current.src = `data:audio/mp3;base64,${base64Audio}`;
+      setPlayAudio(true);
       setResponse(otherData.text);
     }
 
@@ -199,6 +207,7 @@ export const DockBar = () => {
       return;
     }
 
+    setPlayAudio(false);
     mediaRecorder.start();
   };
 
