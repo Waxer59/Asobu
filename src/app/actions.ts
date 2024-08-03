@@ -8,7 +8,8 @@ import {
   AiResponseData,
   OpenMapData,
   OtherData,
-  TranslateData
+  TranslateData,
+  SpotifySearch
 } from '@/types/types';
 import { createOpenAI } from '@ai-sdk/openai';
 import { CoreMessage, generateText } from 'ai';
@@ -199,6 +200,18 @@ export async function getAiResponse(
           execute: async (): Promise<ActionData> => ({
             action: AiActions.CLOSE_TRANSLATE
           })
+        }
+      },
+      spotify: {
+        description: 'Use this tool to play a song',
+        parameters: z.object({
+          query: z.string().describe('The song to play')
+        }),
+        execute: async ({ query }): Promise<SpotifySearch> => {
+          return {
+            text: query,
+            action: AiActions.SPOTIFY_SEARCH
+          };
         }
       }
     });

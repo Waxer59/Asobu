@@ -38,6 +38,7 @@ import {
   TranslateData
 } from '@/types/types';
 import { usePathname, useRouter } from 'next/navigation';
+import { useSpotifyStore } from '@/store/spotify';
 import { PATHNAMES } from '@/constants/constants';
 import { CoreMessage, UserContent } from 'ai';
 import { useMicrophone } from '@hooks/useMicrophone';
@@ -131,6 +132,9 @@ export const DockBar = () => {
       });
     }
 
+    const otherData = data;
+    //Refactor this to use a switch statement
+    useSpotifyStore.setState({ spotifyQuery: text });
     if (imageBase64) {
       newContent.push({
         type: 'image',
