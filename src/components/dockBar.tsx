@@ -35,16 +35,10 @@ import { AiActions, OpenMapData, OtherData } from '@/types/types';
 import { usePathname, useRouter } from 'next/navigation';
 import { PATHNAMES } from '@/constants/constants';
 import { CoreMessage, UserContent } from 'ai';
-import hark, { Harker } from 'hark';
+import { useMicrophone } from '@hooks/useMicrophone';
 
 export const DockBar = () => {
-  const [isRecording, setIsRecording] = useState<boolean>(false);
   const [playAudio, setPlayAudio] = useState<boolean>(false);
-  const [chunks, setChunks] = useState<BlobPart[]>([]);
-  const [mic, setMic] = useState<MediaStream | null>(null);
-  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(
-    null
-  );
   const apiKey = useAiStore((state) => state.apiKey);
   const history = useAiStore((state) => state.history);
   const setIsAiLoading = useAiStore((state) => state.setIsAiLoading);
@@ -61,9 +55,14 @@ export const DockBar = () => {
   const setIsTranslateOpen = useUiStore((state) => state.setIsTranslateOpen);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const router = useRouter();
+  const { startRecording, stopRecording, isRecording, alternateRecording } =
+    useMicrophone({
+      onGetChunks: (chunks) => {
+        sendToAi(chunks);
+      }
+    });
 
   useEffect(() => {
-    getUserMicrophone();
     audioRef.current = new Audio();
   }, []);
 
@@ -78,43 +77,11 @@ export const DockBar = () => {
   }, [playAudio]);
 
   useEffect(() => {
-    if (!mic) return;
-
-    setMediaRecorder(new MediaRecorder(mic));
-  }, [mic]);
-
-  useEffect(() => {
-    if (!chunks.length) return;
-    sendToAi(chunks);
-    setChunks([]);
-  }, [chunks]);
-
-  useEffect(() => {
-    if (!mediaRecorder) return;
-
-    mediaRecorder.ondataavailable = (e) => {
-      setChunks((prev) => [...prev, e.data]);
-    };
-  }, [mediaRecorder]);
-
-  useEffect(() => {
-    if (!mic || !mediaRecorder) return;
-
-    const harkValue: Harker = hark(mic);
-    harkValue.on('stopped_speaking', () => {
-      mediaRecorder.stop();
-    });
-
-    return () => {
-      harkValue?.stop();
-    };
-  }, [mediaRecorder, mic]);
-
-  useEffect(() => {
     if (isRecording) {
+      setPlayAudio(false);
       startRecording();
     } else {
-      mediaRecorder?.stop();
+      stopRecording();
     }
   }, [isRecording]);
 
@@ -130,7 +97,6 @@ export const DockBar = () => {
       return;
     }
 
-    setIsRecording(false);
     setIsAiLoading(true);
 
     const blob = new Blob(chunks, { type: 'audio/mp3' });
@@ -241,42 +207,8 @@ export const DockBar = () => {
     setIsAiLoading(false);
   };
 
-  const getUserMicrophone = async (): Promise<void> => {
-    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-      setMic(
-        await navigator.mediaDevices.getUserMedia({
-          audio: true
-        })
-      );
-    } else {
-      toast({
-        title: 'Error',
-        description: 'Your browser does not support microphone access.',
-        variant: 'destructive'
-      });
-    }
-  };
-
-  const startRecording = async () => {
-    if (!mic || !mediaRecorder) {
-      toast({
-        title: 'Error',
-        description: 'Please allow microphone access.',
-        variant: 'destructive'
-      });
-      return;
-    }
-
-    setPlayAudio(false);
-    mediaRecorder.start();
-  };
-
   const onNavigationClick = async () => {
     toggleNavigation();
-  };
-
-  const onMicrophoneClick = async () => {
-    setIsRecording(!isRecording);
   };
 
   const onTranslateClick = async () => {
@@ -320,7 +252,7 @@ export const DockBar = () => {
                 size="icon"
                 variant={isRecording ? 'default' : 'secondary'}
                 className="rounded-full"
-                onClick={onMicrophoneClick}>
+                onClick={alternateRecording}>
                 <Mic className="stroke-1" />
               </Button>
             </TooltipTrigger>
