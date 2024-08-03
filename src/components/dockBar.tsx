@@ -35,6 +35,7 @@ import {
   AiActions,
   OpenMapData,
   OtherData,
+  SpotifySearch,
   TranslateData
 } from '@/types/types';
 import { usePathname, useRouter } from 'next/navigation';
@@ -71,6 +72,9 @@ export const DockBar = () => {
   const setLanguageOneText = useUiStore((state) => state.setLanguageOneText);
   const setLanguageTwoText = useUiStore((state) => state.setLanguageTwoText);
   const clearclearTranslate = useUiStore((state) => state.clearTranslate);
+  const setSpotifyQuery = useSpotifyStore((state) => state.setSpotifyQuery);
+  const setIsSpotifyOpen = useSpotifyStore((state) => state.setIsSpotifyOpen);
+  const clearSpotify = useSpotifyStore((state) => state.clear);
 
   useEffect(() => {
     audioRef.current = new Audio();
@@ -132,9 +136,6 @@ export const DockBar = () => {
       });
     }
 
-    const otherData = data;
-    //Refactor this to use a switch statement
-    useSpotifyStore.setState({ spotifyQuery: text });
     if (imageBase64) {
       newContent.push({
         type: 'image',
@@ -231,6 +232,25 @@ export const DockBar = () => {
           setPlayAudio(true);
         }
         clearclearTranslate();
+        break;
+      case AiActions.OPEN_SPOTIFY_WEB_PLAYER:
+        const { text: spotifySearch } = data as SpotifySearch;
+
+        if (audioRef.current) {
+          audioRef.current.src = `data:audio/mp3;base64,${await textToSpeech(apiKey, 'Opening Spotify player')}`;
+          setPlayAudio(true);
+        }
+
+        setSpotifyQuery(spotifySearch);
+        setIsSpotifyOpen(true);
+        break;
+      case AiActions.CLOSE_SPOTIFY_WEB_PLAYER:
+        if (audioRef.current) {
+          audioRef.current.src = `data:audio/mp3;base64,${await textToSpeech(apiKey, 'Closing Spotify player')}`;
+          setPlayAudio(true);
+        }
+
+        clearSpotify();
         break;
     }
 

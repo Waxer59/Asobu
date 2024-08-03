@@ -1,32 +1,25 @@
 'use client';
 
-import { searchSpotify } from '@/lib/spotify';
+import { searchSpotify } from '@lib/spotify';
 import { useSession, signIn, signOut } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 import { AuthResponse } from '@/types/types';
 import { Button } from '@components/shadcn/button';
+import { useSpotifyStore } from '@store/spotify';
 import SpotifyPlayer from 'react-spotify-web-playback';
-import { getAiResponse } from '@/app/actions';
-import { useAiStore } from '@/store/ai';
-import { useSpotifyStore } from '@/store/spotify';
 
 export default function SpotifyWidget() {
   const { data } = useSession();
-  console.log(data);
   const authSession = data as AuthResponse;
   const token = authSession?.token.access_token;
-  console.log(token);
   let query = useSpotifyStore.getState().spotifyQuery;
-  console.log(query);
   const [URI, setURI] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchSong = async () => {
       if (!authSession) return;
       const res = await searchSpotify(query, token);
-      console.log(res);
       setURI(res.tracks.items[0].uri);
-      console.log(URI);
     };
 
     fetchSong();
@@ -48,7 +41,7 @@ export default function SpotifyWidget() {
         </svg>
       </Button>
       <div className="absolute bottom-40 right-10">
-        {token && useSpotifyStore.getState().isSpotifyOpen && (
+        {token && (
           <SpotifyPlayer
             token={token}
             uris={URI ? [URI] : []}

@@ -3,6 +3,8 @@
 import { useUiStore } from '@/store/ui';
 import { Translate } from './translate';
 import { Navigation } from './navigation';
+import { useSpotifyStore } from '@/store/spotify';
+import SpotifyWidget from './spotify-widget';
 
 export const Tools = () => {
   const navigationFrom = useUiStore((state) => state.navigationFrom);
@@ -10,6 +12,7 @@ export const Tools = () => {
   const isNavigationOpen = useUiStore((state) => state.isNavigationOpen);
   const isTranslateOpen = useUiStore((state) => state.isTranslateOpen);
   const clearNavigation = useUiStore((state) => state.clearNavigation);
+  const isSpotifyOpen = useSpotifyStore((state) => state.isSpotifyOpen);
 
   const onCloseNavigation = () => {
     clearNavigation();
@@ -25,6 +28,7 @@ export const Tools = () => {
         />
       )}
       {isTranslateOpen && <Translate />}
+      {isSpotifyOpen && <SpotifyWidget />}
     </>
   );
 };

@@ -8,6 +8,7 @@ interface State {
 interface Actions {
   setSpotifyQuery: (query: string) => void;
   setIsSpotifyOpen: (isOpen: boolean) => void;
+  clear: () => void;
 }
 
 const initialState: State = {
@@ -18,5 +19,6 @@ const initialState: State = {
 export const useSpotifyStore = create<State & Actions>((set) => ({
   ...initialState,
   setSpotifyQuery: (query) => set({ spotifyQuery: query }),
-  setIsSpotifyOpen: (isOpen) => set({ isSpotifyOpen: isOpen })
+  setIsSpotifyOpen: (isOpen) => set({ isSpotifyOpen: isOpen }),
+  clear: () => set(initialState)
 }));
