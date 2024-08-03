@@ -6,7 +6,7 @@ const options: NextAuthOptions = {
   providers: [
     SpotifyProvider({
       authorization:
-        'https://accounts.spotify.com/authorize?scope=user-read-email,playlist-read-private,playlist-modify-private,playlist-modify-public',
+        'https://accounts.spotify.com/authorize?scope=user-read-email,user-read-private,playlist-read-private,playlist-modify-private,playlist-modify-public,streaming,user-read-playback-state,user-modify-playback-state',
       clientId: process.env.SPOTIFY_CLIENT_ID || '',
       clientSecret: process.env.SPOTIFY_CLIENT_SECRET || ''
     })
