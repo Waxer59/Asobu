@@ -1,0 +1,117 @@
+import { Mic, Volume2 } from 'lucide-react';
+import {
+  Button,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  Textarea
+} from './shadcn';
+import { TRANSLATE_LANGUAGES } from '@/constants/constants';
+import { useEffect, useRef, useState } from 'react';
+import { useAiStore } from '@/store/ai';
+import { toast } from '@/hooks/useToast';
+import { textToSpeech } from '@/app/actions';
+import { useDebounce } from 'use-debounce';
+
+interface Props {
+  onSelectValueChange: (value: string) => void;
+  onTranslationTextChange: (value: string) => void;
+  translationText: string;
+  selectValue?: string | null;
+}
+
+export const TranslateLanguage = ({
+  onSelectValueChange,
+  selectValue,
+  onTranslationTextChange,
+  translationText
+}: Props) => {
+  const apiKey = useAiStore((state) => state.apiKey);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [text, setText] = useState<string>(translationText);
+  const [debouncedText] = useDebounce(text, 1000);
+
+  useEffect(() => {
+    audioRef.current = new Audio();
+
+    return () => {
+      audioRef.current?.pause();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (translationText === debouncedText) return;
+
+    onTranslationTextChange(debouncedText);
+  }, [debouncedText]);
+
+  useEffect(() => {
+    if (text.trim() === '') {
+      onTranslationTextChange('');
+    }
+  }, [text]);
+
+  useEffect(() => {
+    setText(translationText);
+  }, [translationText]);
+
+  const onReproduceAudio = async () => {
+    if (!apiKey) {
+      toast({
+        title: 'Error',
+        description: 'Please enter a valid API key',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    if (!audioRef.current) {
+      return;
+    }
+
+    const audioBase64 = await textToSpeech(apiKey, translationText);
+
+    audioRef.current.src = `data:audio/mp3;base64,${audioBase64}`;
+    audioRef.current?.play();
+  };
+
+  const onRecordMic = async () => {};
+
+  return (
+    <div className="flex flex-col gap-2 items-cente translate-element">
+      <Select onValueChange={onSelectValueChange} value={selectValue ?? ''}>
+        <SelectTrigger className="w-full">
+          <SelectValue placeholder="Translate" />
+        </SelectTrigger>
+        <SelectContent>
+          {TRANSLATE_LANGUAGES.map((lang) => (
+            <SelectItem key={lang} value={lang}>
+              {lang}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      <Textarea
+        className="w-64 h-48 min-h-48 max-h-48 resize-none"
+        value={text}
+        onChange={(e) => {
+          setText(e.target.value);
+        }}
+      />
+      <div className="flex items-center gap-4 justify-start">
+        <Button
+          size="icon"
+          variant="outline"
+          className="rounded-full"
+          onClick={onRecordMic}>
+          <Mic />
+        </Button>
+        <Button size="icon" variant="ghost" onClick={onReproduceAudio}>
+          <Volume2 />
+        </Button>
+      </div>
+    </div>
+  );
+};

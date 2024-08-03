@@ -30,7 +30,7 @@ import { getAiResponse, textToSpeech, transcribeAudio } from '@/app/actions';
 import { useAiStore } from '@store/ai';
 import { useUiStore } from '@store/ui';
 import { convertBlobToBase64 } from '@lib/utils';
-import { useMediaStore } from '@/store/media-devices';
+import { useMediaStore } from '@store/media-devices';
 import { AiActions, OpenMapData, OtherData } from '@/types/types';
 import { usePathname, useRouter } from 'next/navigation';
 import { PATHNAMES } from '@/constants/constants';
@@ -57,6 +57,8 @@ export const DockBar = () => {
   const setNavigationTo = useUiStore((state) => state.setNavigationTo);
   const setNavigationFrom = useUiStore((state) => state.setNavigationFrom);
   const pathname = usePathname();
+  const isTranslateOpen = useUiStore((state) => state.isTranslateOpen);
+  const setIsTranslateOpen = useUiStore((state) => state.setIsTranslateOpen);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const router = useRouter();
 
@@ -172,7 +174,19 @@ export const DockBar = () => {
       }
     ];
 
-    const { data } = await getAiResponse(apiKey, newHistory);
+    const response = await getAiResponse(apiKey, newHistory);
+
+    if (!response) {
+      setIsAiLoading(false);
+      toast({
+        title: 'Error',
+        description: 'Something went wrong. Please try again.',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    const { data } = response;
 
     setHistory(newHistory);
 
@@ -265,6 +279,10 @@ export const DockBar = () => {
     setIsRecording(!isRecording);
   };
 
+  const onTranslateClick = async () => {
+    setIsTranslateOpen(!isTranslateOpen);
+  };
+
   return (
     <div className="bottom-3 absolute left-0 right-0 flex flex-col items-center gap-4 justify-center">
       <Subtitles />
@@ -349,7 +367,10 @@ export const DockBar = () => {
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button size="icon" variant="ghost">
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      onClick={onTranslateClick}>
                       <Languages />
                     </Button>
                   </TooltipTrigger>
