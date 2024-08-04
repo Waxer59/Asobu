@@ -5,3 +5,4 @@ export * from './spotify';
 export * from './teach-mode';
 export * from './translator';
 export * from './ui';
+export * from './notes';
