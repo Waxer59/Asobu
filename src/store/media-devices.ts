@@ -10,6 +10,7 @@ interface State {
 interface Actions {
   setBaseVideoConstraints: (constraints: MediaTrackConstraints) => void;
   setWebcam: (webcam: Webcam) => void;
+  flipCamera: () => void;
   clear: () => void;
 }
 
@@ -28,6 +29,16 @@ export const useMediaStore = create<State & Actions>()(
     setBaseVideoConstraints: (constraints) =>
       set({ baseVideoConstraints: constraints }),
     setWebcam: (webcam) => set({ webcam }),
+    flipCamera: () =>
+      set((state) => ({
+        baseVideoConstraints: {
+          ...state.baseVideoConstraints,
+          facingMode:
+            state.baseVideoConstraints.facingMode === 'user'
+              ? 'environment'
+              : 'user'
+        }
+      })),
     clear: () => set(initialState)
   }))
 );
