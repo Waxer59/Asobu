@@ -18,6 +18,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="h-full w-full dark">
+      <head>
+        <link rel="icon" href="/favicon.png" sizes="any" />
+      </head>
       <body className={`${inter.className} w-full h-full overflow-hidden`}>
         {children}
         <Toaster />
