@@ -16,6 +16,7 @@ import { textToSpeech, transcribeAudio } from '@/app/actions';
 import { useDebounce } from 'use-debounce';
 import { useMicrophone } from '@/hooks/useMicrophone';
 import { convertBlobToBase64 } from '@/lib/utils';
+import { useAudio } from '@/hooks/useAudio';
 
 interface Props {
   onSelectValueChange: (value: string) => void;
@@ -31,7 +32,6 @@ export const TranslateLanguage = ({
   translationText
 }: Props) => {
   const apiKey = useAiStore((state) => state.apiKey);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
   const [text, setText] = useState<string>(translationText);
   const [debouncedText] = useDebounce(text, 1000);
   const { isRecording, alternateRecording } = useMicrophone({
@@ -39,14 +39,7 @@ export const TranslateLanguage = ({
       translateAudio(chunks);
     }
   });
-
-  useEffect(() => {
-    audioRef.current = new Audio();
-
-    return () => {
-      audioRef.current?.pause();
-    };
-  }, []);
+  const { playAudio, stopAudio } = useAudio();
 
   useEffect(() => {
     if (translationText === debouncedText) return;
@@ -95,14 +88,9 @@ export const TranslateLanguage = ({
       return;
     }
 
-    if (!audioRef.current) {
-      return;
-    }
-
     const audioBase64 = await textToSpeech(apiKey, translationText);
 
-    audioRef.current.src = `data:audio/mp3;base64,${audioBase64}`;
-    audioRef.current?.play();
+    playAudio(`data:audio/mp3;base64,${audioBase64}`);
   };
 
   return (
