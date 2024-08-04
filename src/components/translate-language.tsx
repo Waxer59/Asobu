@@ -1,20 +1,25 @@
+'use client';
+
 import { Mic, Volume2 } from 'lucide-react';
-import {
-  Button,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  Textarea
-} from './shadcn';
+
 import { TRANSLATE_LANGUAGES } from '@constants';
 import { useEffect, useState } from 'react';
 import { useAiStore } from '@/store/ai';
-import { toast, useAudio, useMicrophone } from '@hooks';
 import { textToSpeech, transcribeAudio } from '@/app/actions';
 import { useDebounce } from 'use-debounce';
 import { convertBlobToBase64 } from '@lib/utils';
+import { useAudio } from '@/hooks/useAudio';
+import { useMicrophone } from '@/hooks/useMicrophone';
+import { toast } from '@/hooks/useToast';
+import { Button } from '@shadcn/button';
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem
+} from '@shadcn/select';
+import { Textarea } from '@shadcn/textarea';
 
 interface Props {
   onSelectValueChange: (value: string) => void;

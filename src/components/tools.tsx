@@ -1,10 +1,10 @@
 'use client';
 
 import { useUiStore } from '@store/ui';
+import { useNavigationStore } from '@store/navigation';
 import { Translate } from './translate';
 import { Navigation } from './navigation';
 import SpotifyWidget from './spotify-widget';
-import { useNavigationStore } from '@/store';
 import { Notes } from './notes';
 
 export const Tools = () => {

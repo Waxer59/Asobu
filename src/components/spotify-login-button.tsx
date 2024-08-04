@@ -2,13 +2,13 @@
 
 import { AuthResponse } from '@/types/types';
 import { SpotifyIcon } from './icons';
+import { Button } from '@shadcn/button';
 import {
-  Button,
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger
-} from '@shadcn';
+} from '@shadcn/tooltip';
 import { signIn, signOut, useSession } from 'next-auth/react';
 
 export const SpotifyLoginButton = () => {

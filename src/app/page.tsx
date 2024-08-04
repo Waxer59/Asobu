@@ -1,18 +1,18 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import {
-  Button,
-  Card,
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger
-} from '@shadcn';
 import { useMediaStore } from '@store/media-devices';
 import { toast } from '@hooks/useToast';
 import { SwitchCamera } from 'lucide-react';
 import Webcam from 'react-webcam';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger
+} from '@shadcn/tooltip';
+import { Button } from '@shadcn/button';
+import { Card } from '@shadcn/card';
 
 export default function Page() {
   const [isWebcamError, setIsWebcamError] = useState<boolean>(false);

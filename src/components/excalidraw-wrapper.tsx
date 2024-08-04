@@ -8,7 +8,7 @@ import {
 } from '@excalidraw/excalidraw';
 import { ExcalidrawImperativeAPI } from '@excalidraw/excalidraw/types/types';
 import { useEffect, useState } from 'react';
-import { useTeachModeStore } from '@/store';
+import { useTeachModeStore } from '@store/teach-mode';
 
 const ExcalidrawWrapper = () => {
   const [excalidrawAPI, setExcalidrawAPI] =

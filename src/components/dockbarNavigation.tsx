@@ -1,14 +1,16 @@
+'use client';
+
 import { PATHNAMES } from '@constants';
 import {
-  Button,
-  buttonVariants,
-  Tooltip,
-  TooltipContent,
   TooltipProvider,
-  TooltipTrigger
-} from '@shadcn';
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent
+} from '@radix-ui/react-tooltip';
+
 import { HomeIcon, MessageCircle, Mic, Presentation } from 'lucide-react';
 import Link from 'next/link';
+import { Button, buttonVariants } from '@shadcn/button';
 
 interface Props {
   alternateRecording: () => void;

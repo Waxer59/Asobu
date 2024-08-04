@@ -5,16 +5,16 @@ import {
   DialogContent,
   DialogDescription,
   DialogTrigger
-} from '@shadcn';
+} from '@shadcn/dialog';
 import { Key } from 'lucide-react';
 import APIKeyForm from './api-key-form';
+import { Button } from '@shadcn/button';
 import {
-  Button,
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger
-} from '@shadcn/index';
+} from '@shadcn/tooltip';
 import { DialogTitle } from '@radix-ui/react-dialog';
 import { useToast } from '@hooks/useToast';
 import { useAiStore } from '@store/ai';

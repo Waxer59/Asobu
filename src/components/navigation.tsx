@@ -6,7 +6,7 @@ import mapboxgl, { Map } from 'mapbox-gl';
 import MapboxDirections from '@mapbox/mapbox-gl-directions/dist/mapbox-gl-directions';
 import '@mapbox/mapbox-gl-directions/dist/mapbox-gl-directions.css';
 import { BounceLoader } from 'react-spinners';
-import { TabLayout } from '@/layouts/tab-layout';
+import { TabLayout } from '@layouts/tab-layout';
 
 interface Props {
   from?: string;

@@ -1,17 +1,18 @@
 'use client';
 
-import { useUiStore } from '@/store';
 import {
-  Button,
-  Card,
   Collapsible,
-  CollapsibleContent,
   CollapsibleTrigger,
-  Tooltip,
-  TooltipContent,
+  CollapsibleContent
+} from '@shadcn/collapsible';
+import {
   TooltipProvider,
-  TooltipTrigger
-} from '@shadcn';
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent
+} from '@shadcn/tooltip';
+import { useUiStore } from '@store/ui';
+
 import {
   Languages,
   Music,
@@ -19,6 +20,8 @@ import {
   NotebookPen,
   Wrench
 } from 'lucide-react';
+import { Card } from '@shadcn/card';
+import { Button } from '@shadcn/button';
 
 export const DockbarTools = () => {
   const {

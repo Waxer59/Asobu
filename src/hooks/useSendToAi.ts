@@ -10,18 +10,16 @@ import {
 } from '@/types/types';
 import { UserContent, CoreMessage } from 'ai';
 import router from 'next/router';
-import { toast } from '@hooks';
-import {
-  useAiStore,
-  useMediaStore,
-  useNavigationStore,
-  useNotesStore,
-  useSpotifyStore,
-  useTeachModeStore,
-  useTranslatorStore,
-  useUiStore
-} from '@store';
 import { usePathname } from 'next/navigation';
+import { useAiStore } from '@store/ai';
+import { useMediaStore } from '@store/media-devices';
+import { useNavigationStore } from '@store/navigation';
+import { useNotesStore } from '@store/notes';
+import { useSpotifyStore } from '@store/spotify';
+import { useTeachModeStore } from '@store/teach-mode';
+import { useTranslatorStore } from '@store/translator';
+import { useUiStore } from '@store/ui';
+import { toast } from './useToast';
 
 interface Props {
   apiKey: string | undefined;

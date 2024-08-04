@@ -1,14 +1,16 @@
-import { useAiStore } from '@/store/ai';
-import { BeatLoader } from 'react-spinners';
-import { Button } from './shadcn';
-import { X } from 'lucide-react';
-import { useUiStore } from '@/store';
+'use client';
+
+import { useAiStore } from '@store/ai';
+import { useUiStore } from '@store/ui';
+import { Button } from '@shadcn/button';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger
-} from '@shadcn';
+} from '@shadcn/tooltip';
+import { BeatLoader } from 'react-spinners';
+import { X } from 'lucide-react';
 
 export const Subtitles = () => {
   const response = useAiStore((state) => state.response);

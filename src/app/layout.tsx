@@ -2,10 +2,13 @@
 
 import React from 'react';
 import { Inter } from 'next/font/google';
-import { Toaster } from '@shadcn/index';
-import { SpotifyLoginButton, DockBar, ApiKeyDialog, Tools } from '@components';
 import { SessionProvider } from 'next-auth/react';
+import { ApiKeyDialog } from '@components/api-key-dialog';
+import { DockBar } from '@components/dockBar';
+import { SpotifyLoginButton } from '@components/spotify-login-button';
+import { Tools } from '@components/tools';
 import '../styles/globals.css';
+import { Toaster } from '@shadcn/toaster';
 
 const inter = Inter({ subsets: ['latin'] });
 

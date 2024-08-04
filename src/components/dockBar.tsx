@@ -3,12 +3,16 @@
 import { Card } from '@shadcn/card';
 import { useEffect } from 'react';
 import { Subtitles } from './subtitles';
-import { useMicrophone, useAudio, useSendToAi, toast } from '@hooks';
 import { DockbarTools } from './dockbarTools';
 import { DockbarNavigation } from './dockbarNavigation';
-import { useAiStore, useUiStore } from '@/store';
 import { convertBlobToBase64 } from '@/lib/utils';
 import { transcribeAudio } from '@/app/actions';
+import { useAudio } from '@hooks/useAudio';
+import { useMicrophone } from '@hooks/useMicrophone';
+import { useSendToAi } from '@hooks/useSendToAi';
+import { toast } from '@hooks/useToast';
+import { useAiStore } from '@store/ai';
+import { useUiStore } from '@store/ui';
 
 export const DockBar = () => {
   const { isSubtitlesOpen } = useUiStore();
