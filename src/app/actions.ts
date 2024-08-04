@@ -212,6 +212,13 @@ export async function getAiResponse(
               action: AiActions.SPOTIFY_SEARCH
             };
           }
+        },
+        closeSpotify: {
+          description: 'Use this tool to close the song player',
+          parameters: z.object({}),
+          execute: async (): Promise<ActionData> => ({
+            action: AiActions.CLOSE_SPOTIFY_WEB_PLAYER
+          })
         }
       }
     });

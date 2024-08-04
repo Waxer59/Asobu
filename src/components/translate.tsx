@@ -8,10 +8,11 @@ import { TranslateLanguage } from './translate-language';
 import { toast } from '@hooks/useToast';
 import { translateText } from '@/app/actions';
 import { useAiStore } from '@/store/ai';
-import { useTranslatorStore } from '@/store';
+import { useTranslatorStore, useUiStore } from '@/store';
 
 export const Translate = () => {
   const dragRef = useRef(null);
+  const setIsTranslateOpen = useUiStore((state) => state.setIsTranslateOpen);
   const apiKey = useAiStore((state) => state.apiKey);
   const languageOne = useTranslatorStore((state) => state.languageOne);
   const languageTwo = useTranslatorStore((state) => state.languageTwo);
@@ -53,6 +54,7 @@ export const Translate = () => {
   };
 
   const onClose = () => {
+    setIsTranslateOpen(false);
     clearTranslate();
   };
 
