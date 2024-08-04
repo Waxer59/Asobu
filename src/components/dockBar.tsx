@@ -3,20 +3,46 @@
 import { Card } from '@shadcn/card';
 import { useEffect } from 'react';
 import { Subtitles } from './subtitles';
-import { useMicrophone, useAudio, useSendToAi } from '@hooks';
+import { useMicrophone, useAudio, useSendToAi, toast } from '@hooks';
 import { DockbarTools } from './dockbarTools';
 import { DockbarNavigation } from './dockbarNavigation';
 import { useAiStore, useUiStore } from '@/store';
+import { convertBlobToBase64 } from '@/lib/utils';
+import { transcribeAudio } from '@/app/actions';
 
 export const DockBar = () => {
   const { isSubtitlesOpen } = useUiStore();
+  const apiKey = useAiStore((state) => state.apiKey);
   const { isRecording, alternateRecording } = useMicrophone({
-    onGetChunks: (chunks) => {
-      sendToAi(chunks);
+    onGetChunks: async (chunks) => {
+      const blob = new Blob(chunks, { type: 'audio/mp3' });
+      const audioBase64 = await convertBlobToBase64(blob);
+
+      if (!apiKey) {
+        toast({
+          title: 'Error',
+          description: 'Please enter a valid API key.',
+          variant: 'destructive'
+        });
+        return;
+      }
+
+      const text = await transcribeAudio(apiKey, audioBase64);
+
+      if (!text) {
+        toast({
+          title: 'Error',
+          description: 'Could not transcribe audio.',
+          variant: 'destructive'
+        });
+        return;
+      }
+
+      sendToAi(text);
     }
   });
+
   const { playAudio, stopAudio } = useAudio();
-  const apiKey = useAiStore((state) => state.apiKey);
   const { sendToAi } = useSendToAi({
     apiKey,
     playAudio

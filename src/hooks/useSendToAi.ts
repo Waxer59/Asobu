@@ -1,6 +1,5 @@
-import { transcribeAudio, getAiResponse, textToSpeech } from '@/app/actions';
+import { getAiResponse, textToSpeech } from '@/app/actions';
 import { PATHNAMES } from '@constants';
-import { convertBlobToBase64 } from '@lib/utils';
 import {
   AiActions,
   OpenMapData,
@@ -57,7 +56,7 @@ export const useSendToAi = ({ apiKey, playAudio }: Props) => {
   const addNote = useNotesStore((state) => state.addNote);
   const whiteBoardImage = useTeachModeStore((state) => state.whiteBoardImage);
 
-  const sendToAi = async (chunks: BlobPart[]) => {
+  const sendToAi = async (text: string) => {
     if (!apiKey) {
       toast({
         title: 'Error',
@@ -69,10 +68,6 @@ export const useSendToAi = ({ apiKey, playAudio }: Props) => {
 
     setIsSubtitlesOpen(true);
     setIsAiLoading(true);
-
-    const blob = new Blob(chunks, { type: 'audio/mp3' });
-    const audioBase64 = await convertBlobToBase64(blob);
-    const text = await transcribeAudio(apiKey, audioBase64);
 
     let imageBase64;
 
