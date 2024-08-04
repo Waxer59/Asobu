@@ -8,15 +8,13 @@ import {
   SelectValue,
   Textarea
 } from './shadcn';
-import { TRANSLATE_LANGUAGES } from '@/constants/constants';
-import { useEffect, useRef, useState } from 'react';
+import { TRANSLATE_LANGUAGES } from '@constants';
+import { useEffect, useState } from 'react';
 import { useAiStore } from '@/store/ai';
-import { toast } from '@/hooks/useToast';
+import { toast, useAudio, useMicrophone } from '@hooks';
 import { textToSpeech, transcribeAudio } from '@/app/actions';
 import { useDebounce } from 'use-debounce';
-import { useMicrophone } from '@/hooks/useMicrophone';
-import { convertBlobToBase64 } from '@/lib/utils';
-import { useAudio } from '@/hooks/useAudio';
+import { convertBlobToBase64 } from '@lib/utils';
 
 interface Props {
   onSelectValueChange: (value: string) => void;

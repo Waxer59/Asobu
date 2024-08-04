@@ -3,10 +3,7 @@
 import React from 'react';
 import { Inter } from 'next/font/google';
 import { Toaster } from '@shadcn/index';
-import { SpotifyLoginButton } from '@components/spotify-login-button';
-import { DockBar } from '@components/dockBar';
-import { ApiKeyDialog } from '@components/api-key-dialog';
-import { Tools } from '@components/tools';
+import { SpotifyLoginButton, DockBar, ApiKeyDialog, Tools } from '@components';
 import { SessionProvider } from 'next-auth/react';
 import '../styles/globals.css';
 

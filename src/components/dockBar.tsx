@@ -7,26 +7,13 @@ import {
   TooltipTrigger,
   Card,
   Button,
-  buttonVariants,
-  CollapsibleTrigger,
-  Collapsible,
-  CollapsibleContent
+  buttonVariants
 } from '@shadcn/index';
-import {
-  HomeIcon,
-  Languages,
-  MessageCircle,
-  Mic,
-  Music,
-  Navigation,
-  NotebookPen,
-  Presentation,
-  Wrench
-} from 'lucide-react';
+import { HomeIcon, MessageCircle, Mic, Presentation } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect } from 'react';
 import { Subtitles } from './subtitles';
-import { toast } from '@hooks/useToast';
+import { toast, useMicrophone, useAudio } from '@hooks';
 import { getAiResponse, textToSpeech, transcribeAudio } from '@/app/actions';
 import {
   useAiStore,
@@ -48,10 +35,9 @@ import {
   TranslateData
 } from '@/types/types';
 import { usePathname, useRouter } from 'next/navigation';
-import { PATHNAMES } from '@/constants/constants';
+import { PATHNAMES } from '@constants';
 import { CoreMessage, UserContent } from 'ai';
-import { useMicrophone } from '@hooks/useMicrophone';
-import { useAudio } from '@/hooks/useAudio';
+import { DockbarTools } from './dockbarTools';
 
 export const DockBar = () => {
   const router = useRouter();
@@ -60,31 +46,27 @@ export const DockBar = () => {
   const setResponse = useAiStore((state) => state.setResponse);
   const webcam = useMediaStore((state) => state.webcam);
   const whiteBoardImage = useTeachModeStore((state) => state.whiteBoardImage);
-  const clearNavigation = useNavigationStore((state) => state.clear);
-  const setNavigationTo = useNavigationStore((state) => state.setNavigationTo);
-  const setNavigationFrom = useNavigationStore(
-    (state) => state.setNavigationFrom
-  );
-  const setIsNavigationOpen = useUiStore((state) => state.setIsNavigationOpen);
-  const isTranslateOpen = useUiStore((state) => state.isTranslateOpen);
-  const isSpotifyOpen = useUiStore((state) => state.isSpotifyOpen);
-  const isNotesOpen = useUiStore((state) => state.isNotesOpen);
-  const isSubtitlesOpen = useUiStore((state) => state.isSubtitlesOpen);
-  const setIsTranslateOpen = useUiStore((state) => state.setIsTranslateOpen);
-  const setIsNotesOpen = useUiStore((state) => state.setIsNotesOpen);
-  const setIsSubtitlesOpen = useUiStore((state) => state.setIsSubtitlesOpen);
-  const setIsSpotifyOpen = useUiStore((state) => state.setIsSpotifyOpen);
-  const setLanguageOne = useTranslatorStore((state) => state.setLanguageOne);
-  const setLanguageTwo = useTranslatorStore((state) => state.setLanguageTwo);
-  const setLanguageOneText = useTranslatorStore(
-    (state) => state.setLanguageOneText
-  );
-  const setLanguageTwoText = useTranslatorStore(
-    (state) => state.setLanguageTwoText
-  );
-  const clearTranslate = useTranslatorStore((state) => state.clear);
-  const setSpotifyQuery = useSpotifyStore((state) => state.setSpotifyQuery);
-  const clearSpotify = useSpotifyStore((state) => state.clear);
+  const {
+    setNavigationFrom,
+    setNavigationTo,
+    clear: clearNavigation
+  } = useNavigationStore();
+  const {
+    setIsNavigationOpen,
+    isSubtitlesOpen,
+    setIsTranslateOpen,
+    setIsNotesOpen,
+    setIsSubtitlesOpen,
+    setIsSpotifyOpen
+  } = useUiStore();
+  const {
+    setLanguageOne,
+    setLanguageTwo,
+    setLanguageOneText,
+    setLanguageTwoText,
+    clear: clearTranslate
+  } = useTranslatorStore();
+  const { setSpotifyQuery, clear: clearSpotify } = useSpotifyStore();
   const addNote = useNotesStore((state) => state.addNote);
   const pathname = usePathname();
   const { isRecording, alternateRecording } = useMicrophone({
@@ -99,8 +81,6 @@ export const DockBar = () => {
       stopAudio();
     }
   }, [isRecording]);
-
-  const toggleNavigation = useUiStore((state) => state.toggleNavigation);
 
   const sendToAi = async (chunks: BlobPart[]) => {
     if (!apiKey) {
@@ -271,22 +251,6 @@ export const DockBar = () => {
     setIsAiLoading(false);
   };
 
-  const onMusicClick = () => {
-    setIsSpotifyOpen(!isSpotifyOpen);
-  };
-
-  const onNavigationClick = async () => {
-    toggleNavigation();
-  };
-
-  const onTranslateClick = async () => {
-    setIsTranslateOpen(!isTranslateOpen);
-  };
-
-  const onNotesClick = async () => {
-    setIsNotesOpen(!isNotesOpen);
-  };
-
   return (
     <div className="bottom-3 absolute left-0 right-0 flex flex-col items-center gap-4 justify-center">
       {isSubtitlesOpen && <Subtitles />}
@@ -350,73 +314,7 @@ export const DockBar = () => {
           </Tooltip>
         </TooltipProvider>
 
-        <Collapsible>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <CollapsibleTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="absolute -right-14">
-                    <Wrench className="stroke-1" />
-                  </Button>
-                </CollapsibleTrigger>
-              </TooltipTrigger>
-              <TooltipContent>Tools</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-          <CollapsibleContent>
-            <Card className="absolute flex gap-4 p-2 top-0 left-64">
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      onClick={onTranslateClick}>
-                      <Languages />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Translate</TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      onClick={onNavigationClick}>
-                      <Navigation />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Navigation</TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button size="icon" variant="ghost" onClick={onMusicClick}>
-                      <Music />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Music</TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button size="icon" variant="ghost" onClick={onNotesClick}>
-                      <NotebookPen />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Notes</TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </Card>
-          </CollapsibleContent>
-        </Collapsible>
+        <DockbarTools />
       </Card>
     </div>
   );

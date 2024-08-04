@@ -26,8 +26,11 @@
       "@hooks/*": ["./src/hooks/*"],
       "@helpers/*": ["./src/helpers/*"],
       "@layouts/*": ["./src/layouts/*"],
+      "@constants": ["./src/constants/constants.ts"],
       "@store": ["./src/store/index.ts"],
       "@shadcn": ["./src/components/shadcn/index.ts"],
+      "@components": ["./src/components/index.ts"],
+      "@hooks": ["./src/hooks/index.ts"],
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],

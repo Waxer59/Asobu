@@ -5,7 +5,7 @@ import {
   DialogContent,
   DialogDescription,
   DialogTrigger
-} from '@components/shadcn/dialog';
+} from '@shadcn';
 import { Key } from 'lucide-react';
 import APIKeyForm from './api-key-form';
 import {
