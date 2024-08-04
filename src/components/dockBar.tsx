@@ -69,8 +69,10 @@ export const DockBar = () => {
   const isTranslateOpen = useUiStore((state) => state.isTranslateOpen);
   const isSpotifyOpen = useUiStore((state) => state.isSpotifyOpen);
   const isNotesOpen = useUiStore((state) => state.isNotesOpen);
+  const isSubtitlesOpen = useUiStore((state) => state.isSubtitlesOpen);
   const setIsTranslateOpen = useUiStore((state) => state.setIsTranslateOpen);
   const setIsNotesOpen = useUiStore((state) => state.setIsNotesOpen);
+  const setIsSubtitlesOpen = useUiStore((state) => state.setIsSubtitlesOpen);
   const setIsSpotifyOpen = useUiStore((state) => state.setIsSpotifyOpen);
   const setLanguageOne = useTranslatorStore((state) => state.setLanguageOne);
   const setLanguageTwo = useTranslatorStore((state) => state.setLanguageTwo);
@@ -110,6 +112,7 @@ export const DockBar = () => {
       return;
     }
 
+    setIsSubtitlesOpen(true);
     setIsAiLoading(true);
 
     const blob = new Blob(chunks, { type: 'audio/mp3' });
@@ -286,7 +289,7 @@ export const DockBar = () => {
 
   return (
     <div className="bottom-3 absolute left-0 right-0 flex flex-col items-center gap-4 justify-center">
-      <Subtitles />
+      {isSubtitlesOpen && <Subtitles />}
       <Card className="flex justify-center gap-2 z-10 p-2 relative px-5">
         <TooltipProvider>
           <Tooltip>
