@@ -7,6 +7,9 @@ import Webcam from 'react-webcam';
 import { toast } from '@hooks/useToast';
 import { SessionProvider } from 'next-auth/react';
 import SpotifyWidget from '@components/spotify-widget';
+import { DockBar } from '@/components/dockBar';
+import { ApiKeyDialog } from '@/components/api-key-dialog';
+import { Tools } from '@/components/tools';
 
 export default function Page() {
   const [isWebcamError, setIsWebcamError] = useState<boolean>(false);
@@ -45,6 +48,9 @@ export default function Page() {
         </Card>
         <SpotifyWidget />
       </main>
+      <DockBar />
+      <ApiKeyDialog />
+      <Tools />
     </SessionProvider>
   );
 }

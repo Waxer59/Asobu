@@ -6,23 +6,19 @@ interface State {
   apiKey?: string;
   response?: string;
   isAiLoading: boolean;
-  history: CoreMessage[];
 }
 
 interface Actions {
   setApiKey: (apiKey: string) => void;
   setResponse: (response: string) => void;
   setIsAiLoading: (isAiLoading: boolean) => void;
-  setHistory: (history: CoreMessage[]) => void;
-  addToHistory: (text: CoreMessage) => void;
   clearResponse: () => void;
 }
 
 const initialState: State = {
   apiKey: '',
   response: '',
-  isAiLoading: false,
-  history: []
+  isAiLoading: false
 };
 
 export const useAiStore = create<State & Actions>()(
@@ -41,12 +37,6 @@ export const useAiStore = create<State & Actions>()(
         },
         setIsAiLoading: (isAiLoading) => {
           set({ isAiLoading });
-        },
-        setHistory: (history) => {
-          set({ history });
-        },
-        addToHistory: (text) => {
-          set((state) => ({ history: [...state.history, text] }));
         }
       }),
       {

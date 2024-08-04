@@ -27,10 +27,16 @@ import { useEffect, useRef, useState } from 'react';
 import { Subtitles } from './subtitles';
 import { toast } from '@hooks/useToast';
 import { getAiResponse, textToSpeech, transcribeAudio } from '@/app/actions';
-import { useAiStore } from '@store/ai';
-import { useUiStore } from '@store/ui';
+import {
+  useAiStore,
+  useUiStore,
+  useSpotifyStore,
+  useMediaStore,
+  useTeachModeStore,
+  useNavigationStore,
+  useTranslatorStore
+} from '@store';
 import { convertBlobToBase64 } from '@lib/utils';
-import { useMediaStore } from '@store/media-devices';
 import {
   AiActions,
   OpenMapData,
@@ -39,42 +45,45 @@ import {
   TranslateData
 } from '@/types/types';
 import { usePathname, useRouter } from 'next/navigation';
-import { useSpotifyStore } from '@/store/spotify';
 import { PATHNAMES } from '@/constants/constants';
 import { CoreMessage, UserContent } from 'ai';
 import { useMicrophone } from '@hooks/useMicrophone';
 
 export const DockBar = () => {
+  const router = useRouter();
   const [playAudio, setPlayAudio] = useState<boolean>(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const apiKey = useAiStore((state) => state.apiKey);
-  const history = useAiStore((state) => state.history);
   const setIsAiLoading = useAiStore((state) => state.setIsAiLoading);
-  const setHistory = useAiStore((state) => state.setHistory);
   const setResponse = useAiStore((state) => state.setResponse);
   const webcam = useMediaStore((state) => state.webcam);
-  const whiteBoardImage = useUiStore((state) => state.whiteBoardImage);
-  const clearNavigation = useUiStore((state) => state.clearNavigation);
+  const whiteBoardImage = useTeachModeStore((state) => state.whiteBoardImage);
+  const clearNavigation = useNavigationStore((state) => state.clear);
+  const setNavigationTo = useNavigationStore((state) => state.setNavigationTo);
+  const setNavigationFrom = useNavigationStore(
+    (state) => state.setNavigationFrom
+  );
   const setIsNavigationOpen = useUiStore((state) => state.setIsNavigationOpen);
-  const setNavigationTo = useUiStore((state) => state.setNavigationTo);
-  const setNavigationFrom = useUiStore((state) => state.setNavigationFrom);
-  const pathname = usePathname();
   const isTranslateOpen = useUiStore((state) => state.isTranslateOpen);
   const setIsTranslateOpen = useUiStore((state) => state.setIsTranslateOpen);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const router = useRouter();
+  const setIsSpotifyOpen = useUiStore((state) => state.setIsSpotifyOpen);
+  const setLanguageOne = useTranslatorStore((state) => state.setLanguageOne);
+  const setLanguageTwo = useTranslatorStore((state) => state.setLanguageTwo);
+  const setLanguageOneText = useTranslatorStore(
+    (state) => state.setLanguageOneText
+  );
+  const setLanguageTwoText = useTranslatorStore(
+    (state) => state.setLanguageTwoText
+  );
+  const clearclearTranslate = useTranslatorStore((state) => state.clear);
+  const setSpotifyQuery = useSpotifyStore((state) => state.setSpotifyQuery);
+  const clearSpotify = useSpotifyStore((state) => state.clear);
+  const pathname = usePathname();
   const { isRecording, alternateRecording } = useMicrophone({
     onGetChunks: (chunks) => {
       sendToAi(chunks);
     }
   });
-  const setLanguageOne = useUiStore((state) => state.setLanguageOne);
-  const setLanguageTwo = useUiStore((state) => state.setLanguageTwo);
-  const setLanguageOneText = useUiStore((state) => state.setLanguageOneText);
-  const setLanguageTwoText = useUiStore((state) => state.setLanguageTwoText);
-  const clearclearTranslate = useUiStore((state) => state.clearTranslate);
-  const setSpotifyQuery = useSpotifyStore((state) => state.setSpotifyQuery);
-  const setIsSpotifyOpen = useSpotifyStore((state) => state.setIsSpotifyOpen);
-  const clearSpotify = useSpotifyStore((state) => state.clear);
 
   useEffect(() => {
     audioRef.current = new Audio();
@@ -143,14 +152,14 @@ export const DockBar = () => {
       });
     }
 
-    const newHistory: CoreMessage[] = [
+    const newMessage: CoreMessage[] = [
       {
         role: 'user',
         content: newContent
       }
     ];
 
-    const response = await getAiResponse(apiKey, newHistory);
+    const response = await getAiResponse(apiKey, newMessage);
 
     if (!response) {
       setIsAiLoading(false);
@@ -163,8 +172,6 @@ export const DockBar = () => {
     }
 
     const { data } = response;
-
-    setHistory(newHistory);
 
     switch (data.action) {
       case AiActions.OPEN_MAP:
