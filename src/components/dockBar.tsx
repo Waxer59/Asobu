@@ -17,6 +17,7 @@ import {
   Languages,
   MessageCircle,
   Mic,
+  Music,
   Navigation,
   NotebookPen,
   Presentation,
@@ -66,6 +67,7 @@ export const DockBar = () => {
   );
   const setIsNavigationOpen = useUiStore((state) => state.setIsNavigationOpen);
   const isTranslateOpen = useUiStore((state) => state.isTranslateOpen);
+  const isSpotifyOpen = useUiStore((state) => state.isSpotifyOpen);
   const isNotesOpen = useUiStore((state) => state.isNotesOpen);
   const setIsTranslateOpen = useUiStore((state) => state.setIsTranslateOpen);
   const setIsNotesOpen = useUiStore((state) => state.setIsNotesOpen);
@@ -151,8 +153,6 @@ export const DockBar = () => {
     ];
 
     const response = await getAiResponse(apiKey, newMessage);
-
-    console.log(response);
 
     if (!response) {
       setIsAiLoading(false);
@@ -266,6 +266,10 @@ export const DockBar = () => {
     }
 
     setIsAiLoading(false);
+  };
+
+  const onMusicClick = () => {
+    setIsSpotifyOpen(!isSpotifyOpen);
   };
 
   const onNavigationClick = async () => {
@@ -385,6 +389,16 @@ export const DockBar = () => {
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>Navigation</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button size="icon" variant="ghost" onClick={onMusicClick}>
+                      <Music />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Music</TooltipContent>
                 </Tooltip>
               </TooltipProvider>
               <TooltipProvider>
