@@ -1,4 +1,5 @@
-import { Button, Card } from '@shadcn';
+import { Button } from '@components/shadcn/button';
+import { Card } from '@components/shadcn/card';
 import { X } from 'lucide-react';
 import { useRef } from 'react';
 import Draggable from 'react-draggable';

@@ -1,13 +1,14 @@
 'use client';
 
-import { Button } from './shadcn';
 import { ArrowRightLeft } from 'lucide-react';
 import { TranslateLanguage } from './translate-language';
 import { toast } from '@hooks/useToast';
 import { translateText } from '@/app/actions';
-import { useAiStore } from '@/store/ai';
-import { useTranslatorStore, useUiStore } from '@/store';
-import { TabLayout } from '@/layouts/tab-layout';
+import { useAiStore } from '@store/ai';
+import { TabLayout } from '@layouts/tab-layout';
+import { useTranslatorStore } from '@store/translator';
+import { useUiStore } from '@store/ui';
+import { Button } from '@shadcn/button';
 
 export const Translate = () => {
   const setIsTranslateOpen = useUiStore((state) => state.setIsTranslateOpen);

@@ -1,8 +1,11 @@
-import { useNotesStore, useUiStore } from '@/store';
+'use client';
+
 import { TabLayout } from '@layouts/tab-layout';
-import { Input } from './shadcn';
+import { Input } from '@shadcn/input';
 import { Note } from './note';
 import { useState } from 'react';
+import { useUiStore } from '@store/ui';
+import { useNotesStore } from '@store/notes';
 
 export const Notes = () => {
   const setIsNotesOpen = useUiStore((state) => state.setIsNotesOpen);

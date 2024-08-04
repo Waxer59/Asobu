@@ -1,24 +1,22 @@
 'use client';
 
-import {
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-  FormControl,
-  Form,
-  Input,
-  Button,
-  DialogClose
-} from '@shadcn/index';
-
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
+import { Form, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import { useAiStore } from '@store/ai';
 import { useToast } from '@hooks/useToast';
 import { useEffect } from 'react';
+import {
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage
+} from '@shadcn/form';
+import { Input } from '@shadcn/input';
+import { Button } from '@shadcn/button';
+import { DialogClose } from '@shadcn/dialog';
 
 const formSchema = z.object({
   apiKey: z.string()

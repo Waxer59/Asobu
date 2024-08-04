@@ -16,7 +16,7 @@ import { createOpenAI } from '@ai-sdk/openai';
 import { CoreMessage, generateText } from 'ai';
 import OpenAI, { toFile } from 'openai';
 import { z } from 'zod';
-import { TRANSLATE_LANGUAGES } from '@/constants/constants';
+import { TRANSLATE_LANGUAGES } from '@constants';
 
 export async function translateText(
   apiKey: string,

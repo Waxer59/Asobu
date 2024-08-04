@@ -1,4 +1,6 @@
-import { useNotesStore } from '@/store';
+'use client';
+
+import { useNotesStore } from '@/store/notes';
 import { NoteData } from '@/types/types';
 // @ts-expect-error No types
 import SwipeToDelete from 'react-swipe-to-delete-component';
