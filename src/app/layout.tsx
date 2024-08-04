@@ -1,15 +1,17 @@
-import type { Metadata } from 'next';
+'use client';
+
 import React from 'react';
 import { Inter } from 'next/font/google';
 import { Toaster } from '@shadcn/index';
+import { SpotifyLoginButton } from '@components/spotify-login-button';
+import { DockBar } from '@components/dockBar';
+import { ApiKeyDialog } from '@components/api-key-dialog';
+import { Tools } from '@components/tools';
+import { SessionProvider } from 'next-auth/react';
+import Head from 'next/head';
 import '../styles/globals.css';
 
 const inter = Inter({ subsets: ['latin'] });
-
-export const metadata: Metadata = {
-  title: 'Asobu | Ai',
-  description: 'TODO'
-};
 
 export default function RootLayout({
   children
@@ -18,12 +20,20 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="h-full w-full dark">
-      <head>
+      <Head>
+        <title>Asobu | Ai</title>
+        <meta name="description" content="TODO" />
         <link rel="icon" href="/favicon.png" sizes="any" />
-      </head>
+      </Head>
       <body className={`${inter.className} w-full h-full overflow-hidden`}>
-        {children}
-        <Toaster />
+        <SessionProvider>
+          {children}
+          <Toaster />
+          <SpotifyLoginButton />
+          <DockBar />
+          <ApiKeyDialog />
+          <Tools />
+        </SessionProvider>
       </body>
     </html>
   );

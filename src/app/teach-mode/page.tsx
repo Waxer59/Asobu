@@ -1,8 +1,5 @@
 'use client';
 
-import { ApiKeyDialog } from '@/components/api-key-dialog';
-import { DockBar } from '@/components/dockBar';
-import { Tools } from '@/components/tools';
 import { Card } from '@shadcn/index';
 import dynamic from 'next/dynamic';
 import Head from 'next/head';
@@ -24,9 +21,6 @@ export default function Page() {
           <ExcalidrawWithClientOnly />
         </Card>
       </div>
-      <DockBar />
-      <ApiKeyDialog />
-      <Tools />
     </>
   );
 }
