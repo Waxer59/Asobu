@@ -5,6 +5,7 @@ interface State {
   isNavigationOpen: boolean;
   isTranslateOpen: boolean;
   isSpotifyOpen: boolean;
+  isNotesOpen: boolean;
 }
 
 interface Actions {
@@ -12,13 +13,15 @@ interface Actions {
   setIsNavigationOpen: (isOpen: boolean) => void;
   setIsSpotifyOpen: (isOpen: boolean) => void;
   setIsTranslateOpen: (isOpen: boolean) => void;
+  setIsNotesOpen: (isOpen: boolean) => void;
   clear: () => void;
 }
 
 const initialState: State = {
   isNavigationOpen: false,
   isTranslateOpen: false,
-  isSpotifyOpen: false
+  isSpotifyOpen: false,
+  isNotesOpen: false
 };
 
 export const useUiStore = create<State & Actions>()(
@@ -27,8 +30,9 @@ export const useUiStore = create<State & Actions>()(
     toggleNavigation: () =>
       set((state) => ({ isNavigationOpen: !state.isNavigationOpen })),
     setIsNavigationOpen: (isOpen) => set({ isNavigationOpen: isOpen }),
-    clear: () => set(initialState),
     setIsTranslateOpen: (isOpen) => set({ isTranslateOpen: isOpen }),
-    setIsSpotifyOpen: (isOpen) => set({ isSpotifyOpen: isOpen })
+    setIsSpotifyOpen: (isOpen) => set({ isSpotifyOpen: isOpen }),
+    setIsNotesOpen: (isOpen) => set({ isNotesOpen: isOpen }),
+    clear: () => set(initialState)
   }))
 );

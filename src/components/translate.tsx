@@ -1,17 +1,15 @@
 'use client';
 
-import Draggable from 'react-draggable';
-import { Button, Card } from './shadcn';
-import { ArrowRightLeft, X } from 'lucide-react';
-import { useRef } from 'react';
+import { Button } from './shadcn';
+import { ArrowRightLeft } from 'lucide-react';
 import { TranslateLanguage } from './translate-language';
 import { toast } from '@hooks/useToast';
 import { translateText } from '@/app/actions';
 import { useAiStore } from '@/store/ai';
 import { useTranslatorStore, useUiStore } from '@/store';
+import { TabLayout } from '@/layouts/tab-layout';
 
 export const Translate = () => {
-  const dragRef = useRef(null);
   const setIsTranslateOpen = useUiStore((state) => state.setIsTranslateOpen);
   const apiKey = useAiStore((state) => state.apiKey);
   const languageOne = useTranslatorStore((state) => state.languageOne);
@@ -138,39 +136,27 @@ export const Translate = () => {
   };
 
   return (
-    <Draggable nodeRef={dragRef} bounds="parent" cancel=".translate-element">
-      <div ref={dragRef} className="absolute z-50 top-0">
-        <Card className="cursor-move p-7 flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="absolute top-2 right-2 w-5 h-5"
-            onClick={onClose}>
-            <X />
-          </Button>
+    <TabLayout cancelDrag=".translate-element" onClose={onClose}>
+      <TranslateLanguage
+        onSelectValueChange={onChangeLanguageOne}
+        selectValue={languageOne}
+        onTranslationTextChange={onTranslationOneText}
+        translationText={languageOneText}
+      />
 
-          <TranslateLanguage
-            onSelectValueChange={onChangeLanguageOne}
-            selectValue={languageOne}
-            onTranslationTextChange={onTranslationOneText}
-            translationText={languageOneText}
-          />
-
-          <div className="flex flex-col items-center gap-2">
-            <Button size="icon" variant="ghost" onClick={onSwitchLanguages}>
-              <ArrowRightLeft />
-            </Button>
-            <div className="h-60 w-[1px] bg-zinc-500"></div>
-          </div>
-
-          <TranslateLanguage
-            onSelectValueChange={onChangeLanguageTwo}
-            selectValue={languageTwo}
-            onTranslationTextChange={onTranslationTwoText}
-            translationText={languageTwoText}
-          />
-        </Card>
+      <div className="flex flex-col items-center gap-2">
+        <Button size="icon" variant="ghost" onClick={onSwitchLanguages}>
+          <ArrowRightLeft />
+        </Button>
+        <div className="h-60 w-[1px] bg-zinc-500"></div>
       </div>
-    </Draggable>
+
+      <TranslateLanguage
+        onSelectValueChange={onChangeLanguageTwo}
+        selectValue={languageTwo}
+        onTranslationTextChange={onTranslationTwoText}
+        translationText={languageTwoText}
+      />
+    </TabLayout>
   );
 };

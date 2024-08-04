@@ -17,8 +17,8 @@ import {
   Languages,
   MessageCircle,
   Mic,
-  Music,
   Navigation,
+  NotebookPen,
   Presentation,
   Wrench
 } from 'lucide-react';
@@ -34,11 +34,13 @@ import {
   useMediaStore,
   useTeachModeStore,
   useNavigationStore,
-  useTranslatorStore
+  useTranslatorStore,
+  useNotesStore
 } from '@store';
 import { convertBlobToBase64 } from '@lib/utils';
 import {
   AiActions,
+  CreateNoteData,
   OpenMapData,
   OtherData,
   SpotifySearch,
@@ -64,7 +66,9 @@ export const DockBar = () => {
   );
   const setIsNavigationOpen = useUiStore((state) => state.setIsNavigationOpen);
   const isTranslateOpen = useUiStore((state) => state.isTranslateOpen);
+  const isNotesOpen = useUiStore((state) => state.isNotesOpen);
   const setIsTranslateOpen = useUiStore((state) => state.setIsTranslateOpen);
+  const setIsNotesOpen = useUiStore((state) => state.setIsNotesOpen);
   const setIsSpotifyOpen = useUiStore((state) => state.setIsSpotifyOpen);
   const setLanguageOne = useTranslatorStore((state) => state.setLanguageOne);
   const setLanguageTwo = useTranslatorStore((state) => state.setLanguageTwo);
@@ -77,6 +81,7 @@ export const DockBar = () => {
   const clearTranslate = useTranslatorStore((state) => state.clear);
   const setSpotifyQuery = useSpotifyStore((state) => state.setSpotifyQuery);
   const clearSpotify = useSpotifyStore((state) => state.clear);
+  const addNote = useNotesStore((state) => state.addNote);
   const pathname = usePathname();
   const { isRecording, alternateRecording } = useMicrophone({
     onGetChunks: (chunks) => {
@@ -237,6 +242,27 @@ export const DockBar = () => {
         clearSpotify();
         setIsSpotifyOpen(false);
         break;
+      case AiActions.CREATE_NOTE:
+        const { text: noteText } = data as CreateNoteData;
+
+        playAudio(
+          `data:audio/mp3;base64,${await textToSpeech(apiKey, 'Note created!')}`
+        );
+        const id = crypto.randomUUID();
+        addNote({ id, text: noteText });
+        break;
+      case AiActions.OPEN_NOTES:
+        setIsNotesOpen(true);
+        playAudio(
+          `data:audio/mp3;base64,${await textToSpeech(apiKey, 'Opening notes')}`
+        );
+        break;
+      case AiActions.CLOSE_NOTES:
+        setIsNotesOpen(false);
+        playAudio(
+          `data:audio/mp3;base64,${await textToSpeech(apiKey, 'Closing notes')}`
+        );
+        break;
     }
 
     setIsAiLoading(false);
@@ -248,6 +274,10 @@ export const DockBar = () => {
 
   const onTranslateClick = async () => {
     setIsTranslateOpen(!isTranslateOpen);
+  };
+
+  const onNotesClick = async () => {
+    setIsNotesOpen(!isNotesOpen);
   };
 
   return (
@@ -360,11 +390,11 @@ export const DockBar = () => {
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button size="icon" variant="ghost">
-                      <Music />
+                    <Button size="icon" variant="ghost" onClick={onNotesClick}>
+                      <NotebookPen />
                     </Button>
                   </TooltipTrigger>
-                  <TooltipContent>Music</TooltipContent>
+                  <TooltipContent>Notes</TooltipContent>
                 </Tooltip>
               </TooltipProvider>
             </Card>
