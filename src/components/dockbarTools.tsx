@@ -1,3 +1,5 @@
+'use client';
+
 import { useUiStore } from '@/store';
 import {
   Button,
