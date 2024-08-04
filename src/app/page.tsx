@@ -46,7 +46,7 @@ export default function Page() {
                 onClick={onFlipCameraClick}
                 variant="ghost"
                 size="icon"
-                className="absolute top-3 right-3">
+                className="absolute top-3 right-3 z-10">
                 <SwitchCamera />
               </Button>
             </TooltipTrigger>
