@@ -15,7 +15,7 @@ This project was developed by the following team members:
 
 ## Features
 
-- **Music:** Enjoy seamless music playback through Spotify integration. Please note, this feature requires Spotify authentication and a premium account.
+- **Music:** Enjoy seamless music playback through Spotify integration. Please note, this feature requires Spotify authentication and a premium account. (Note: Spotify feature is only available in local development)
 - **Navigation:** Ask for directions and navigate from point A to point B with ease.
 - **Translation:** Instantly translate text between multiple languages.
 - **TeachMode:** Get detailed explanations and solutions for academic problems.
