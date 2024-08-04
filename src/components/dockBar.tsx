@@ -147,6 +147,8 @@ export const DockBar = () => {
 
     const response = await getAiResponse(apiKey, newMessage);
 
+    console.log(response);
+
     if (!response) {
       setIsAiLoading(false);
       toast({

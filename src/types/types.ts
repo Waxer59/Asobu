@@ -6,12 +6,16 @@ export enum AiActions {
   CLOSE_TEACH_MODE,
   OPEN_TRANSLATE,
   CLOSE_TRANSLATE,
-  SPOTIFY_SEARCH,
   OPEN_SPOTIFY_WEB_PLAYER,
   CLOSE_SPOTIFY_WEB_PLAYER
 }
 
-export type AiResponse = OtherData | OpenMapData | ActionData | TranslateData | SpotifySearch;
+export type AiResponse =
+  | OtherData
+  | OpenMapData
+  | ActionData
+  | TranslateData
+  | SpotifySearch;
 
 export interface OtherData {
   text: string;
@@ -38,7 +42,7 @@ export interface OpenMapData {
 
 export interface SpotifySearch {
   text: string;
-  action: AiActions.SPOTIFY_SEARCH;
+  action: AiActions.OPEN_SPOTIFY_WEB_PLAYER;
 }
 
 export interface AiRequestData {

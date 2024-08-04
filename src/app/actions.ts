@@ -209,7 +209,7 @@ export async function getAiResponse(
           execute: async ({ query }): Promise<SpotifySearch> => {
             return {
               text: query,
-              action: AiActions.SPOTIFY_SEARCH
+              action: AiActions.OPEN_SPOTIFY_WEB_PLAYER
             };
           }
         },
