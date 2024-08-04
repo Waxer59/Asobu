@@ -1,7 +1,6 @@
 'use client';
 
 import { convertBlobToBase64 } from '@lib/utils';
-import { useUiStore } from '@store/ui';
 import {
   Excalidraw,
   exportToBlob,
@@ -9,11 +8,14 @@ import {
 } from '@excalidraw/excalidraw';
 import { ExcalidrawImperativeAPI } from '@excalidraw/excalidraw/types/types';
 import { useEffect, useState } from 'react';
+import { useTeachModeStore } from '@/store';
 
 const ExcalidrawWrapper = () => {
   const [excalidrawAPI, setExcalidrawAPI] =
     useState<ExcalidrawImperativeAPI | null>(null);
-  const setWhiteBoardImage = useUiStore((state) => state.setWhiteBoardImage);
+  const setWhiteBoardImage = useTeachModeStore(
+    (state) => state.setWhiteBoardImage
+  );
 
   useHandleLibrary({ excalidrawAPI });
 

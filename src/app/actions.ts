@@ -200,18 +200,25 @@ export async function getAiResponse(
           execute: async (): Promise<ActionData> => ({
             action: AiActions.CLOSE_TRANSLATE
           })
-        }
-      },
-      spotify: {
-        description: 'Use this tool to play a song',
-        parameters: z.object({
-          query: z.string().describe('The song to play')
-        }),
-        execute: async ({ query }): Promise<SpotifySearch> => {
-          return {
-            text: query,
-            action: AiActions.SPOTIFY_SEARCH
-          };
+        },
+        spotify: {
+          description: 'Use this tool to play a song',
+          parameters: z.object({
+            query: z.string().describe('The song to play')
+          }),
+          execute: async ({ query }): Promise<SpotifySearch> => {
+            return {
+              text: query,
+              action: AiActions.SPOTIFY_SEARCH
+            };
+          }
+        },
+        closeSpotify: {
+          description: 'Use this tool to close the song player',
+          parameters: z.object({}),
+          execute: async (): Promise<ActionData> => ({
+            action: AiActions.CLOSE_SPOTIFY_WEB_PLAYER
+          })
         }
       }
     });

@@ -23,72 +23,71 @@ import {
   Wrench
 } from 'lucide-react';
 import Link from 'next/link';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect } from 'react';
 import { Subtitles } from './subtitles';
 import { toast } from '@hooks/useToast';
 import { getAiResponse, textToSpeech, transcribeAudio } from '@/app/actions';
-import { useAiStore } from '@store/ai';
-import { useUiStore } from '@store/ui';
+import {
+  useAiStore,
+  useUiStore,
+  useSpotifyStore,
+  useMediaStore,
+  useTeachModeStore,
+  useNavigationStore,
+  useTranslatorStore
+} from '@store';
 import { convertBlobToBase64 } from '@lib/utils';
-import { useMediaStore } from '@store/media-devices';
 import {
   AiActions,
   OpenMapData,
   OtherData,
+  SpotifySearch,
   TranslateData
 } from '@/types/types';
 import { usePathname, useRouter } from 'next/navigation';
-import { useSpotifyStore } from '@/store/spotify';
 import { PATHNAMES } from '@/constants/constants';
 import { CoreMessage, UserContent } from 'ai';
 import { useMicrophone } from '@hooks/useMicrophone';
+import { useAudio } from '@/hooks/useAudio';
 
 export const DockBar = () => {
-  const [playAudio, setPlayAudio] = useState<boolean>(false);
+  const router = useRouter();
   const apiKey = useAiStore((state) => state.apiKey);
-  const history = useAiStore((state) => state.history);
   const setIsAiLoading = useAiStore((state) => state.setIsAiLoading);
-  const setHistory = useAiStore((state) => state.setHistory);
   const setResponse = useAiStore((state) => state.setResponse);
   const webcam = useMediaStore((state) => state.webcam);
-  const whiteBoardImage = useUiStore((state) => state.whiteBoardImage);
-  const clearNavigation = useUiStore((state) => state.clearNavigation);
+  const whiteBoardImage = useTeachModeStore((state) => state.whiteBoardImage);
+  const clearNavigation = useNavigationStore((state) => state.clear);
+  const setNavigationTo = useNavigationStore((state) => state.setNavigationTo);
+  const setNavigationFrom = useNavigationStore(
+    (state) => state.setNavigationFrom
+  );
   const setIsNavigationOpen = useUiStore((state) => state.setIsNavigationOpen);
-  const setNavigationTo = useUiStore((state) => state.setNavigationTo);
-  const setNavigationFrom = useUiStore((state) => state.setNavigationFrom);
-  const pathname = usePathname();
   const isTranslateOpen = useUiStore((state) => state.isTranslateOpen);
   const setIsTranslateOpen = useUiStore((state) => state.setIsTranslateOpen);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const router = useRouter();
+  const setIsSpotifyOpen = useUiStore((state) => state.setIsSpotifyOpen);
+  const setLanguageOne = useTranslatorStore((state) => state.setLanguageOne);
+  const setLanguageTwo = useTranslatorStore((state) => state.setLanguageTwo);
+  const setLanguageOneText = useTranslatorStore(
+    (state) => state.setLanguageOneText
+  );
+  const setLanguageTwoText = useTranslatorStore(
+    (state) => state.setLanguageTwoText
+  );
+  const clearTranslate = useTranslatorStore((state) => state.clear);
+  const setSpotifyQuery = useSpotifyStore((state) => state.setSpotifyQuery);
+  const clearSpotify = useSpotifyStore((state) => state.clear);
+  const pathname = usePathname();
   const { isRecording, alternateRecording } = useMicrophone({
     onGetChunks: (chunks) => {
       sendToAi(chunks);
     }
   });
-  const setLanguageOne = useUiStore((state) => state.setLanguageOne);
-  const setLanguageTwo = useUiStore((state) => state.setLanguageTwo);
-  const setLanguageOneText = useUiStore((state) => state.setLanguageOneText);
-  const setLanguageTwoText = useUiStore((state) => state.setLanguageTwoText);
-  const clearclearTranslate = useUiStore((state) => state.clearTranslate);
-
-  useEffect(() => {
-    audioRef.current = new Audio();
-  }, []);
-
-  useEffect(() => {
-    if (!audioRef.current) return;
-
-    if (playAudio) {
-      audioRef.current.play();
-    } else {
-      audioRef.current.pause();
-    }
-  }, [playAudio]);
+  const { playAudio, stopAudio } = useAudio();
 
   useEffect(() => {
     if (isRecording) {
-      setPlayAudio(false);
+      stopAudio();
     }
   }, [isRecording]);
 
@@ -132,9 +131,6 @@ export const DockBar = () => {
       });
     }
 
-    const otherData = data;
-    //Refactor this to use a switch statement
-    useSpotifyStore.setState({ spotifyQuery: text });
     if (imageBase64) {
       newContent.push({
         type: 'image',
@@ -142,14 +138,14 @@ export const DockBar = () => {
       });
     }
 
-    const newHistory: CoreMessage[] = [
+    const newMessage: CoreMessage[] = [
       {
         role: 'user',
         content: newContent
       }
     ];
 
-    const response = await getAiResponse(apiKey, newHistory);
+    const response = await getAiResponse(apiKey, newMessage);
 
     if (!response) {
       setIsAiLoading(false);
@@ -163,61 +159,50 @@ export const DockBar = () => {
 
     const { data } = response;
 
-    setHistory(newHistory);
-
     switch (data.action) {
       case AiActions.OPEN_MAP:
         const { from, to } = data as OpenMapData;
-        if (audioRef.current) {
-          audioRef.current.src = `data:audio/mp3;base64,${await textToSpeech(apiKey, 'Opening the map')}`;
-          setPlayAudio(true);
-        }
-
+        playAudio(
+          `data:audio/mp3;base64,${await textToSpeech(apiKey, 'Opening the map')}`
+        );
         setIsNavigationOpen(true);
         setNavigationTo(to);
         setNavigationFrom(from ?? undefined);
         break;
       case AiActions.CLOSE_MAP:
         clearNavigation();
-        if (audioRef.current) {
-          audioRef.current.src = `data:audio/mp3;base64,${await textToSpeech(apiKey, 'Closing the map')}`;
-        }
-        setPlayAudio(true);
+        playAudio(
+          `data:audio/mp3;base64,${await textToSpeech(apiKey, 'Closing the map')}`
+        );
         break;
       case AiActions.NONE:
         const otherData = data as OtherData;
 
-        if (otherData.text && audioRef.current) {
-          audioRef.current.src = `data:audio/mp3;base64,${await textToSpeech(apiKey, otherData.text)}`;
-          setPlayAudio(true);
+        if (otherData.text) {
+          playAudio(
+            `data:audio/mp3;base64,${await textToSpeech(apiKey, otherData.text)}`
+          );
           setResponse(otherData.text);
         }
         break;
       case AiActions.OPEN_TEACH_MODE:
         textToSpeech(apiKey, 'Opening teach mode').then((res) => {
-          if (audioRef.current) {
-            audioRef.current.src = `data:audio/mp3;base64,${res}`;
-            setPlayAudio(true);
-          }
+          playAudio(`data:audio/mp3;base64,${res}`);
           router.push(PATHNAMES.TEACH_MODE);
         });
         break;
       case AiActions.CLOSE_TEACH_MODE:
         textToSpeech(apiKey, 'Closing teach mode').then((res) => {
-          if (audioRef.current) {
-            audioRef.current.src = `data:audio/mp3;base64,${res}`;
-            setPlayAudio(true);
-          }
+          playAudio(`data:audio/mp3;base64,${res}`);
           router.push(PATHNAMES.INDEX);
         });
         break;
       case AiActions.OPEN_TRANSLATE:
         const { languageOne, languageTwo, text, translatedText } =
           data as TranslateData;
-        if (audioRef.current) {
-          audioRef.current.src = `data:audio/mp3;base64,${await textToSpeech(apiKey, 'Opening the translator')}`;
-          setPlayAudio(true);
-        }
+        playAudio(
+          `data:audio/mp3;base64,${await textToSpeech(apiKey, 'Opening the translator')}`
+        );
 
         setIsTranslateOpen(true);
         setLanguageOne(languageOne);
@@ -226,11 +211,29 @@ export const DockBar = () => {
         setLanguageTwoText(translatedText);
         break;
       case AiActions.CLOSE_TRANSLATE:
-        if (audioRef.current) {
-          audioRef.current.src = `data:audio/mp3;base64,${await textToSpeech(apiKey, 'Closing the translator')}`;
-          setPlayAudio(true);
-        }
-        clearclearTranslate();
+        playAudio(
+          `data:audio/mp3;base64,${await textToSpeech(apiKey, 'Closing the translator')}`
+        );
+        setIsTranslateOpen(false);
+        clearTranslate();
+        break;
+      case AiActions.OPEN_SPOTIFY_WEB_PLAYER:
+        const { text: spotifySearch } = data as SpotifySearch;
+
+        playAudio(
+          `data:audio/mp3;base64,${await textToSpeech(apiKey, 'Opening Spotify player')}`
+        );
+
+        setSpotifyQuery(spotifySearch);
+        setIsSpotifyOpen(true);
+        break;
+      case AiActions.CLOSE_SPOTIFY_WEB_PLAYER:
+        playAudio(
+          `data:audio/mp3;base64,${await textToSpeech(apiKey, 'Closing Spotify player')}`
+        );
+
+        clearSpotify();
+        setIsSpotifyOpen(false);
         break;
     }
 

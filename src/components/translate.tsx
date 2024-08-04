@@ -3,27 +3,31 @@
 import Draggable from 'react-draggable';
 import { Button, Card } from './shadcn';
 import { ArrowRightLeft, X } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
-import { useUiStore } from '@/store/ui';
+import { useRef } from 'react';
 import { TranslateLanguage } from './translate-language';
 import { toast } from '@hooks/useToast';
 import { translateText } from '@/app/actions';
 import { useAiStore } from '@/store/ai';
-import { useDebounce } from 'use-debounce';
+import { useTranslatorStore, useUiStore } from '@/store';
 
 export const Translate = () => {
   const dragRef = useRef(null);
+  const setIsTranslateOpen = useUiStore((state) => state.setIsTranslateOpen);
   const apiKey = useAiStore((state) => state.apiKey);
-  const languageOne = useUiStore((state) => state.languageOne);
-  const languageTwo = useUiStore((state) => state.languageTwo);
-  const languageOneText = useUiStore((state) => state.languageOneText);
-  const languageTwoText = useUiStore((state) => state.languageTwoText);
-  const setLanguageOne = useUiStore((state) => state.setLanguageOne);
-  const setLanguageTwo = useUiStore((state) => state.setLanguageTwo);
-  const setLanguageOneText = useUiStore((state) => state.setLanguageOneText);
-  const setLanguageTwoText = useUiStore((state) => state.setLanguageTwoText);
-  const switchLanguages = useUiStore((state) => state.switchLanguages);
-  const clearTranslate = useUiStore((state) => state.clearTranslate);
+  const languageOne = useTranslatorStore((state) => state.languageOne);
+  const languageTwo = useTranslatorStore((state) => state.languageTwo);
+  const languageOneText = useTranslatorStore((state) => state.languageOneText);
+  const languageTwoText = useTranslatorStore((state) => state.languageTwoText);
+  const setLanguageOne = useTranslatorStore((state) => state.setLanguageOne);
+  const setLanguageTwo = useTranslatorStore((state) => state.setLanguageTwo);
+  const setLanguageOneText = useTranslatorStore(
+    (state) => state.setLanguageOneText
+  );
+  const setLanguageTwoText = useTranslatorStore(
+    (state) => state.setLanguageTwoText
+  );
+  const switchLanguages = useTranslatorStore((state) => state.switchLanguages);
+  const clearTranslate = useTranslatorStore((state) => state.clear);
 
   const startTranslation = async (
     textToTranslate: string,
@@ -50,6 +54,7 @@ export const Translate = () => {
   };
 
   const onClose = () => {
+    setIsTranslateOpen(false);
     clearTranslate();
   };
 
