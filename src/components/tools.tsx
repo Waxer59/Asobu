@@ -8,8 +8,6 @@ import SpotifyWidget from './spotify-widget';
 import { Notes } from './notes';
 
 export const Tools = () => {
-  const navigationFrom = useNavigationStore((state) => state.navigationFrom);
-  const navigationTo = useNavigationStore((state) => state.navigationTo);
   const isNavigationOpen = useUiStore((state) => state.isNavigationOpen);
   const isTranslateOpen = useUiStore((state) => state.isTranslateOpen);
   const isSpotifyOpen = useUiStore((state) => state.isSpotifyOpen);
@@ -22,13 +20,7 @@ export const Tools = () => {
 
   return (
     <>
-      {isNavigationOpen && (
-        <Navigation
-          destination={navigationTo}
-          from={navigationFrom}
-          onClose={onCloseNavigation}
-        />
-      )}
+      {isNavigationOpen && <Navigation />}
       {isTranslateOpen && <Translate />}
       {isSpotifyOpen && <SpotifyWidget />}
       {isNotesOpen && <Notes />}
