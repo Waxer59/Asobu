@@ -7,7 +7,20 @@ export enum AiActions {
   OPEN_TRANSLATE,
   CLOSE_TRANSLATE,
   OPEN_SPOTIFY_WEB_PLAYER,
-  CLOSE_SPOTIFY_WEB_PLAYER
+  CLOSE_SPOTIFY_WEB_PLAYER,
+  OPEN_NOTES,
+  CLOSE_NOTES,
+  CREATE_NOTE
+}
+
+export interface NoteData {
+  id: string;
+  text: string;
+}
+
+export interface CreateNoteData {
+  text: string;
+  action: AiActions.CREATE_NOTE;
 }
 
 export type AiResponse =

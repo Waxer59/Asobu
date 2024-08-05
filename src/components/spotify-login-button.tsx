@@ -2,7 +2,13 @@
 
 import { AuthResponse } from '@/types/types';
 import { SpotifyIcon } from './icons';
-import { Button } from './shadcn';
+import { Button } from '@shadcn/button';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger
+} from '@shadcn/tooltip';
 import { signIn, signOut, useSession } from 'next-auth/react';
 
 export const SpotifyLoginButton = () => {
@@ -10,11 +16,20 @@ export const SpotifyLoginButton = () => {
   const authSession = data as AuthResponse;
 
   return (
-    <Button
-      variant="ghost"
-      className="absolute top-6 right-20"
-      onClick={() => (authSession ? signOut() : signIn())}>
-      <SpotifyIcon className={authSession ? 'text-green-600' : ''} />
-    </Button>
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="ghost"
+            className="absolute top-6 right-20 z-10"
+            onClick={() => (authSession ? signOut() : signIn())}>
+            <SpotifyIcon className={authSession ? 'text-green-600' : ''} />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>
+          {authSession ? 'Sign Out' : 'Sign In with Spotify'}
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 };

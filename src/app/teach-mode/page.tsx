@@ -1,6 +1,6 @@
 'use client';
 
-import { Card } from '@shadcn/index';
+import { Card } from '@/components/shadcn/card';
 import dynamic from 'next/dynamic';
 import Head from 'next/head';
 const ExcalidrawWithClientOnly = dynamic(

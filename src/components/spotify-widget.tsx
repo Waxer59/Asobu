@@ -18,7 +18,7 @@ export default function SpotifyWidget() {
     const fetchSong = async () => {
       if (!authSession) return;
       const res = await searchSpotify(query, token);
-      setURI(res.tracks.items[0].uri);
+      setURI(res?.tracks?.items[0]?.uri ?? null);
     };
 
     fetchSong();

@@ -9,13 +9,14 @@ import {
   OpenMapData,
   OtherData,
   TranslateData,
-  SpotifySearch
+  SpotifySearch,
+  CreateNoteData
 } from '@/types/types';
 import { createOpenAI } from '@ai-sdk/openai';
 import { CoreMessage, generateText } from 'ai';
 import OpenAI, { toFile } from 'openai';
 import { z } from 'zod';
-import { TRANSLATE_LANGUAGES } from '@/constants/constants';
+import { TRANSLATE_LANGUAGES } from '@constants';
 
 export async function translateText(
   apiKey: string,
@@ -218,6 +219,30 @@ export async function getAiResponse(
           parameters: z.object({}),
           execute: async (): Promise<ActionData> => ({
             action: AiActions.CLOSE_SPOTIFY_WEB_PLAYER
+          })
+        },
+        createNote: {
+          description: 'Use this tool to create a note',
+          parameters: z.object({
+            note: z.string().describe('The note to create')
+          }),
+          execute: async ({ note }): Promise<CreateNoteData> => ({
+            text: note,
+            action: AiActions.CREATE_NOTE
+          })
+        },
+        openNotes: {
+          description: 'Use this tool to open notes or a note',
+          parameters: z.object({}),
+          execute: async (): Promise<ActionData> => ({
+            action: AiActions.OPEN_NOTES
+          })
+        },
+        closeNotes: {
+          description: 'Use this tool to close notes or a note',
+          parameters: z.object({}),
+          execute: async (): Promise<ActionData> => ({
+            action: AiActions.CLOSE_NOTES
           })
         }
       }

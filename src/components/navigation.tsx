@@ -5,10 +5,8 @@ import mapboxgl, { Map } from 'mapbox-gl';
 // @ts-expect-error No types file
 import MapboxDirections from '@mapbox/mapbox-gl-directions/dist/mapbox-gl-directions';
 import '@mapbox/mapbox-gl-directions/dist/mapbox-gl-directions.css';
-import { Card, Button } from '@shadcn/index';
-import Draggable from 'react-draggable';
 import { BounceLoader } from 'react-spinners';
-import { X } from 'lucide-react';
+import { TabLayout } from '@layouts/tab-layout';
 
 interface Props {
   from?: string;
@@ -23,7 +21,6 @@ export const Navigation = ({ destination, from, onClose }: Props) => {
   const directions = useRef<any>(null);
   const mapContainer = useRef<any>(null);
   const map = useRef<Map | null>(null);
-  const dragRef = useRef(null);
   const [isMapLoading, setIsMapLoading] = useState<boolean>(true);
 
   const getCurrentPositionCb: PositionCallback = (position) => {
@@ -82,28 +79,17 @@ export const Navigation = ({ destination, from, onClose }: Props) => {
   }, []);
 
   return (
-    <Draggable nodeRef={dragRef} bounds="parent" cancel="#map">
-      <div ref={dragRef} className="absolute z-50 top-0">
-        <Card className="cursor-move p-7 flex items-center">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="absolute top-2 right-2 w-5 h-5"
-            onClick={onClose}>
-            <X />
-          </Button>
-          {isMapLoading && (
-            <div className="flex flex-col items-center justify-center gap-4 w-80 h-80">
-              <BounceLoader color="#e2e2e2" />
-              <span className="font-bold">Loading map...</span>
-            </div>
-          )}
-          <div
-            ref={mapContainer}
-            id="map"
-            className={`h-80 rounded-md flex ${isMapLoading ? 'hidden' : ''}`}></div>
-        </Card>
-      </div>
-    </Draggable>
+    <TabLayout cancelDrag="#map" onClose={onClose}>
+      {isMapLoading && (
+        <div className="flex flex-col items-center justify-center gap-4 w-80 h-80">
+          <BounceLoader color="#e2e2e2" />
+          <span className="font-bold">Loading map...</span>
+        </div>
+      )}
+      <div
+        ref={mapContainer}
+        id="map"
+        className={`h-80 rounded-md flex ${isMapLoading ? 'hidden' : ''}`}></div>
+    </TabLayout>
   );
 };
