@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Inter } from 'next/font/google';
-import { Toaster } from '@shadcn/index';
+import { Toaster } from '@components/shadcn/toaster';
 import { SpotifyLoginButton } from '@components/spotify-login-button';
 import { DockBar } from '@components/dockBar';
 import { ApiKeyDialog } from '@components/api-key-dialog';

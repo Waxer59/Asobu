@@ -1,4 +1,4 @@
-import { Button } from './shadcn';
+import { Button } from '@components/shadcn/button';
 import { Github } from 'lucide-react';
 import { Section, Container } from '@components/craft';
 import Link from 'next/link';

@@ -1,5 +1,5 @@
 import { useRouter } from 'next/navigation';
-import { Button } from './shadcn';
+import { Button } from './shadcn/button';
 import { Bot } from 'lucide-react';
 import Link from 'next/link';
 
