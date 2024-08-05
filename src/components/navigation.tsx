@@ -7,14 +7,14 @@ import MapboxDirections from '@mapbox/mapbox-gl-directions/dist/mapbox-gl-direct
 import '@mapbox/mapbox-gl-directions/dist/mapbox-gl-directions.css';
 import { BounceLoader } from 'react-spinners';
 import { TabLayout } from '@layouts/tab-layout';
+import { useNavigationStore } from '@/store/navigation';
+import { useUiStore } from '@/store/ui';
 
-interface Props {
-  from?: string;
-  destination: string;
-  onClose: () => void;
-}
-
-export const Navigation = ({ destination, from, onClose }: Props) => {
+export const Navigation = () => {
+  const navigationFrom = useNavigationStore((state) => state.navigationFrom);
+  const navigationTo = useNavigationStore((state) => state.navigationTo);
+  const clear = useNavigationStore((state) => state.clear);
+  const setIsNavigationOpen = useUiStore((state) => state.setIsNavigationOpen);
   const [lat, setLat] = useState<number>(0);
   const [lng, setLng] = useState<number>(0);
   const watchID = useRef<number | null>(null);
@@ -29,7 +29,7 @@ export const Navigation = ({ destination, from, onClose }: Props) => {
   };
 
   useEffect(() => {
-    if (from) return;
+    if (navigationFrom) return;
 
     map.current?.setCenter({ lat, lng });
   }, [lat, lng]);
@@ -61,8 +61,8 @@ export const Navigation = ({ destination, from, onClose }: Props) => {
       const { latitude: lat, longitude: lng } = position.coords;
       map.current?.setCenter({ lat, lng });
       map.current?.on('load', () => {
-        directions.current.setOrigin(from ?? [lng, lat]);
-        directions.current.setDestination(destination);
+        directions.current.setOrigin(navigationFrom ?? [lng, lat]);
+        directions.current.setDestination(navigationTo);
         setIsMapLoading(false);
       });
     };
@@ -77,6 +77,11 @@ export const Navigation = ({ destination, from, onClose }: Props) => {
       }
     };
   }, []);
+
+  const onClose = () => {
+    setIsNavigationOpen(false);
+    clear();
+  };
 
   return (
     <TabLayout cancelDrag="#map" onClose={onClose}>

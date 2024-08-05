@@ -67,7 +67,7 @@ export const DockbarTools = () => {
         </Tooltip>
       </TooltipProvider>
       <CollapsibleContent>
-        <Card className="absolute flex gap-4 p-2 top-0 left-64">
+        <Card className="absolute flex items-center gap-4 p-2 flex-col -top-56 left-48 md:flex-row md:top-0 md:left-64">
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>

@@ -33,7 +33,7 @@ export default function Page() {
 
   return (
     <main className="w-full h-full flex p-4">
-      <Card className="mx-auto p-2 h-[800px] w-[650px] relative">
+      <Card className="mx-auto p-2 h-[85dvh] w-[650px] relative">
         {isWebcamError && (
           <div className="w-full h-full flex items-center justify-center bg-zinc-900/50 rounded-md">
             <p>Error accessing camera</p>

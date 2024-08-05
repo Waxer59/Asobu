@@ -1,10 +1,7 @@
-'use client';
-
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-
 import { useAiStore } from '@store/ai';
+import { useForm } from 'react-hook-form';
 import { useToast } from '@hooks/useToast';
 import { useEffect } from 'react';
 import {
