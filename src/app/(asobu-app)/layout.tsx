@@ -1,38 +1,40 @@
-'use client';
-
-import React from 'react';
-import { Inter } from 'next/font/google';
+import type { ReactNode } from 'react';
 import { Toaster } from '@components/shadcn/toaster';
 import { SpotifyLoginButton } from '@components/spotify-login-button';
 import { DockBar } from '@components/dockBar';
 import { ApiKeyDialog } from '@components/api-key-dialog';
 import { Tools } from '@components/tools';
-import { SessionProvider } from 'next-auth/react';
+import { Inter } from 'next/font/google';
+import { NextAuthProvider } from '@components/auth-provider';
+import { Metadata } from 'next';
 import '../../styles/globals.css';
 
 const inter = Inter({ subsets: ['latin'] });
 
-export default function RootLayout({
+export const metadata: Metadata = {
+  title: 'Asobu | Ai',
+  description: 'TODO',
+  icons: {
+    icon: '/favicon.png'
+  }
+};
+
+export default function AILayout({
   children
 }: Readonly<{
-  children: React.ReactNode;
+  children: ReactNode;
 }>) {
   return (
     <html lang="en" className="h-full w-full dark">
-      <head>
-        <title>Asobu | Ai</title>
-        <meta name="description" content="TODO" />
-        <link rel="icon" href="/favicon.png" />
-      </head>
-      <body className={`${inter.className} w-full h-full overflow-hidden`}>
-        <SessionProvider>
+      <body className={`${inter.className} w-full h-full`}>
+        <NextAuthProvider>
           {children}
           <Toaster />
           <SpotifyLoginButton />
           <DockBar />
           <ApiKeyDialog />
           <Tools />
-        </SessionProvider>
+        </NextAuthProvider>
       </body>
     </html>
   );

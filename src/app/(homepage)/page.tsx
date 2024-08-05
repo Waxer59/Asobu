@@ -1,9 +1,9 @@
-import { Card, CardContent, CardHeader } from '@/components/shadcn/card';
+import { Card, CardContent, CardHeader } from '@shadcn/card';
 import Link from 'next/link';
 import { cn } from '@lib/utils';
 import { FEATURES } from '@/constants/constants';
 import { Sparkles } from 'lucide-react';
-import { Button } from '@/components/shadcn/button';
+import { Button } from '@shadcn/button';
 
 export default function Page() {
   return (

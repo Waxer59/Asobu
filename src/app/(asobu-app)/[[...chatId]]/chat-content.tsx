@@ -1,18 +1,18 @@
-"use client";
+'use client';
 
-import { useState, useRef } from "react";
+import { useState, useRef } from 'react';
 
-import ChatInput from "@components/chat-input";
+import ChatInput from '@components/chat-input';
 
-import Markdown from "react-markdown";
-import remarkGfm from "remark-gfm";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { vscDarkPlus as dark } from "react-syntax-highlighter/dist/esm/styles/prism";
+import Markdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { vscDarkPlus as dark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
-import { convertFileToBase64 } from "@lib/utils";
+import { convertFileToBase64 } from '@lib/utils';
 
 export default function ChatContent() {
-  const [assistantResponse, setAssistantResponse] = useState("");
+  const [assistantResponse, setAssistantResponse] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const abortControllerRef = useRef<AbortController | null>(null);
 
@@ -21,22 +21,22 @@ export default function ChatContent() {
     // image url
 
     setIsLoading(true);
-    setAssistantResponse("");
+    setAssistantResponse('');
 
-    let body = "";
+    let body = '';
     if (file) {
       const imageUrl = await convertFileToBase64(file);
       const content = [
         {
-          type: "image_url",
+          type: 'image_url',
           image_url: {
-            url: imageUrl,
-          },
+            url: imageUrl
+          }
         },
         {
-          type: "text",
-          text: value,
-        },
+          type: 'text',
+          text: value
+        }
       ];
 
       body = JSON.stringify({ content });
@@ -47,17 +47,17 @@ export default function ChatContent() {
     // console.log("submit", value, file);
     try {
       abortControllerRef.current = new AbortController();
-      const res = await fetch("/api/message", {
-        method: "POST",
+      const res = await fetch('/api/message', {
+        method: 'POST',
         body: body,
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json'
         },
-        signal: abortControllerRef.current.signal,
+        signal: abortControllerRef.current.signal
       });
 
       if (!res.ok || !res.body) {
-        alert("Error sending message");
+        alert('Error sending message');
         return;
       }
 
@@ -75,8 +75,8 @@ export default function ChatContent() {
         }
       }
     } catch (error: any) {
-      if (error.name !== "AbortError") {
-        alert("Error sending message");
+      if (error.name !== 'AbortError') {
+        alert('Error sending message');
       }
     }
     abortControllerRef.current = null;
@@ -99,12 +99,12 @@ export default function ChatContent() {
           components={{
             code(props) {
               const { children, className, node, ...rest } = props;
-              const match = /language-(\w+)/.exec(className || "");
+              const match = /language-(\w+)/.exec(className || '');
               return match ? (
                 <SyntaxHighlighter
                   PreTag="div"
                   // eslint-disable-next-line
-                  children={String(children).replace(/\n$/, "")}
+                  children={String(children).replace(/\n$/, '')}
                   language={match[1]}
                   style={dark}
                   wrapLines={true}
@@ -115,9 +115,8 @@ export default function ChatContent() {
                   {children}
                 </code>
               );
-            },
-          }}
-        >
+            }
+          }}>
           {assistantResponse}
         </Markdown>
       </div>
