@@ -6,8 +6,7 @@ import {
   Tooltip,
   TooltipTrigger,
   TooltipContent
-} from '@radix-ui/react-tooltip';
-
+} from '@shadcn/tooltip';
 import { HomeIcon, MessageCircle, Mic, Presentation } from 'lucide-react';
 import Link from 'next/link';
 import { Button, buttonVariants } from '@shadcn/button';

@@ -1,7 +1,6 @@
 'use client';
 
 import { Mic, Volume2 } from 'lucide-react';
-
 import { TRANSLATE_LANGUAGES } from '@constants';
 import { useEffect, useState } from 'react';
 import { useAiStore } from '@/store/ai';

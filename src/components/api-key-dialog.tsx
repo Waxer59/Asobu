@@ -4,6 +4,7 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogTitle,
   DialogTrigger
 } from '@shadcn/dialog';
 import { Key } from 'lucide-react';
@@ -15,7 +16,6 @@ import {
   TooltipProvider,
   TooltipTrigger
 } from '@shadcn/tooltip';
-import { DialogTitle } from '@radix-ui/react-dialog';
 import { useToast } from '@hooks/useToast';
 import { useAiStore } from '@store/ai';
 import { useEffect, useState } from 'react';
@@ -43,7 +43,7 @@ export const ApiKeyDialog = () => {
   }, [mounted]);
 
   return (
-    <div className="absolute top-6 right-6">
+    <div className="absolute bottom-16 right-2 z-10 md:top-6">
       <Dialog>
         <TooltipProvider>
           <Tooltip>

@@ -1,9 +1,5 @@
-'use client';
-
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Form, useForm } from 'react-hook-form';
 import { z } from 'zod';
-
 import { useAiStore } from '@store/ai';
 import { useToast } from '@hooks/useToast';
 import { useEffect } from 'react';
@@ -12,11 +8,13 @@ import {
   FormItem,
   FormLabel,
   FormControl,
-  FormMessage
+  FormMessage,
+  Form
 } from '@shadcn/form';
 import { Input } from '@shadcn/input';
 import { Button } from '@shadcn/button';
 import { DialogClose } from '@shadcn/dialog';
+import { useForm } from 'react-hook-form';
 
 const formSchema = z.object({
   apiKey: z.string()
