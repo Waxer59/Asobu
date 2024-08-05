@@ -21,7 +21,7 @@ export const SpotifyLoginButton = () => {
         <TooltipTrigger asChild>
           <Button
             variant="ghost"
-            className="absolute top-6 right-20 z-10"
+            className="absolute bottom-[70px] right-20 md:top-6 z-10"
             onClick={() => (authSession ? signOut() : signIn())}>
             <SpotifyIcon className={authSession ? 'text-green-600' : ''} />
           </Button>
