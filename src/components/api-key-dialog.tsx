@@ -43,7 +43,7 @@ export const ApiKeyDialog = () => {
   }, [mounted]);
 
   return (
-    <div className="absolute bottom-[70px] right-6 z-10 md:top-6">
+    <div className="absolute bottom-16 right-2 z-10 md:top-6">
       <Dialog>
         <TooltipProvider>
           <Tooltip>
