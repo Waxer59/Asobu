@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     type: 'website',
     images: [
       {
-        url: `/asobu-og.png`,
+        url: '/asobu-og.png',
         width: 1200,
         height: 630,
         alt: 'og banner'
