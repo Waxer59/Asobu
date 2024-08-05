@@ -26,7 +26,7 @@ export default function AILayout({
 }>) {
   return (
     <html lang="en" className="h-full w-full dark">
-      <body className={`${inter.className} w-full h-full`}>
+      <body className={`${inter.className} w-full h-full overflow-hidden`}>
         <NextAuthProvider>
           {children}
           <Toaster />
