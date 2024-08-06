@@ -105,8 +105,6 @@ export const useSendToAi = ({ apiKey, playAudio }: Props) => {
     ];
 
     const response = await getAiResponse(apiKey, newMessage);
-    console.log(text);
-    console.log(response);
 
     if (!response) {
       setIsAiLoading(false);
