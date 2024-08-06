@@ -98,7 +98,7 @@ export default function ChatContent() {
   return (
     <div className="pt-24">
       <ol
-        className="max-w-4xl mx-auto w-[90%] flex flex-col max-h-[75dvh] overflow-y-auto pr-3 gap-8"
+        className="max-w-4xl mx-auto w-[90%] flex flex-col max-h-[70dvh] overflow-y-auto pr-3 gap-8"
         ref={messagesRef}>
         {messages.map(({ id, content, img, role }) => (
           <Message key={id} content={content} img={img} role={role} />

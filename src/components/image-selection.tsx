@@ -48,6 +48,10 @@ export default function ImageSelection({
   };
 
   const onAttachMediaClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+
     fileInputRef.current?.click();
   };
 
