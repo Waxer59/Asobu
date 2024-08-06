@@ -52,7 +52,7 @@ export default function Page() {
         </span>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10">
           {FEATURES.map(({ header, content }) => (
-            <Card className="border-slate-700">
+            <Card className="border-slate-700" key={header}>
               <div>
                 <CardHeader className="font-bold text-green-500 flex flex-row gap-x-4">
                   <Sparkles />

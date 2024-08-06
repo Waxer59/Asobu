@@ -104,6 +104,26 @@ export async function textToSpeech(
   }
 }
 
+export async function continueConversation(
+  apiKey: string,
+  history: CoreMessage[]
+): Promise<string> {
+  'use server';
+
+  const openai = createOpenAI({
+    apiKey,
+    compatibility: 'strict' // strict mode, enable when using the OpenAI API
+  });
+
+  const { text } = await generateText({
+    model: openai('gpt-4o'),
+    system: 'You are a friendly assistant!',
+    messages: history
+  });
+
+  return text;
+}
+
 export async function getAiResponse(
   apiKey: string,
   history: CoreMessage[]
@@ -120,7 +140,7 @@ export async function getAiResponse(
       model: openai('gpt-4o'),
       system: 'You are a helpful assistant.',
       toolChoice: 'required',
-      messages: [...history],
+      messages: history,
       tools: {
         other: {
           description: 'Use this tool when you need to answer any question',
@@ -154,14 +174,14 @@ export async function getAiResponse(
           })
         },
         openTeachMode: {
-          description: 'Use this tool to open the teach mode or whiteboard',
+          description: 'Use this tool to open the teach mode',
           parameters: z.object({}),
           execute: async (): Promise<ActionData> => ({
             action: AiActions.OPEN_TEACH_MODE
           })
         },
         closeTeachMode: {
-          description: 'Use this tool to close the teach mode or whiteboard',
+          description: 'Use this tool to close the teach mode',
           parameters: z.object({}),
           execute: async (): Promise<ActionData> => ({
             action: AiActions.CLOSE_TEACH_MODE
@@ -243,6 +263,13 @@ export async function getAiResponse(
           parameters: z.object({}),
           execute: async (): Promise<ActionData> => ({
             action: AiActions.CLOSE_NOTES
+          })
+        },
+        openChat: {
+          description: 'Use this tool to open the chat',
+          parameters: z.object({}),
+          execute: async (): Promise<ActionData> => ({
+            action: AiActions.OPEN_CHAT
           })
         }
       }

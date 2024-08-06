@@ -1,130 +1,110 @@
 'use client';
 
-import { useState, useRef } from 'react';
-
+import { useEffect, useRef, useState } from 'react';
 import ChatInput from '@components/chat-input';
 
-import Markdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { vscDarkPlus as dark } from 'react-syntax-highlighter/dist/esm/styles/prism';
+// Allow streaming responses up to 30 seconds
+export const maxDuration = 30;
 
 import { convertFileToBase64 } from '@lib/utils';
+import { Message } from './message';
+import { MessageData, MessageRoles } from '@/types/types';
+import { useChatStore } from '@/store/chat';
+import { continueConversation } from '@/app/actions';
+import { useAiStore } from '@/store/ai';
+import { toast } from '@/hooks/useToast';
+import { CoreMessage, UserContent } from 'ai';
+import { MB_IN_BYTES } from '@/constants/constants';
 
 export default function ChatContent() {
-  const [assistantResponse, setAssistantResponse] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const abortControllerRef = useRef<AbortController | null>(null);
+  const messages = useChatStore((state) => state.messages);
+  const addMessage = useChatStore((state) => state.addMessage);
+  const apiKey = useAiStore((state) => state.apiKey);
+  const messagesRef = useRef<HTMLOListElement>(null);
+
+  useEffect(() => {
+    messagesRef.current?.scrollTo({
+      behavior: 'smooth',
+      top: messagesRef.current?.scrollHeight
+    });
+  }, [messages]);
 
   const handleSubmit = async (value: string, file?: File) => {
-    // upload it somewhere like s3
-    // image url
+    if (!apiKey) {
+      toast({
+        title: 'Error',
+        content: 'Please enter your API key',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    if (!value.trim()) {
+      return;
+    }
+
+    if (file && file.size > MB_IN_BYTES) {
+      toast({
+        title: 'Error',
+        description: 'File size too large',
+        variant: 'destructive'
+      });
+      return;
+    }
 
     setIsLoading(true);
-    setAssistantResponse('');
 
-    let body = '';
+    let img;
     if (file) {
-      const imageUrl = await convertFileToBase64(file);
-      const content = [
-        {
-          type: 'image_url',
-          image_url: {
-            url: imageUrl
-          }
-        },
-        {
-          type: 'text',
-          text: value
-        }
-      ];
-
-      body = JSON.stringify({ content });
-    } else {
-      body = JSON.stringify({ content: value });
+      img = await convertFileToBase64(file);
     }
 
-    // console.log("submit", value, file);
-    try {
-      abortControllerRef.current = new AbortController();
-      const res = await fetch('/api/message', {
-        method: 'POST',
-        body: body,
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        signal: abortControllerRef.current.signal
-      });
+    const newMessageData: MessageData = {
+      id: crypto.randomUUID(),
+      content: value,
+      role: MessageRoles.USER,
+      img
+    };
 
-      if (!res.ok || !res.body) {
-        alert('Error sending message');
-        return;
-      }
+    const newMessages = [...messages, newMessageData];
 
-      const reader = res.body.getReader();
+    addMessage(newMessageData);
 
-      const decoder = new TextDecoder();
-      while (true) {
-        const { value, done } = await reader.read();
+    const response = await continueConversation(
+      apiKey,
+      newMessages.map(({ content, img, role }) => {
+        const messageContent: UserContent = [{ type: 'text', text: content }];
 
-        const text = decoder.decode(value);
-        setAssistantResponse((currentValue) => currentValue + text);
-
-        if (done) {
-          break;
+        if (img && messageContent.length) {
+          messageContent.push({
+            type: 'image',
+            image: img
+          });
         }
-      }
-    } catch (error: any) {
-      if (error.name !== 'AbortError') {
-        alert('Error sending message');
-      }
-    }
-    abortControllerRef.current = null;
+
+        return { role: role, content: messageContent };
+      }) as CoreMessage[]
+    );
+
+    addMessage({
+      id: crypto.randomUUID(),
+      role: MessageRoles.ASSISTANT,
+      content: response
+    });
     setIsLoading(false);
   };
 
-  const handleStop = () => {
-    if (!abortControllerRef.current) {
-      return;
-    }
-    abortControllerRef.current.abort();
-    abortControllerRef.current = null;
-  };
-
   return (
-    <>
-      <div className="max-w-4xl w-full mx-auto flex-1 px-10 py-5 overflow-x-hidden overflow-y-auto prose dark:prose-invert">
-        <Markdown
-          remarkPlugins={[remarkGfm]}
-          components={{
-            code(props) {
-              const { children, className, node, ...rest } = props;
-              const match = /language-(\w+)/.exec(className || '');
-              return match ? (
-                <SyntaxHighlighter
-                  PreTag="div"
-                  // eslint-disable-next-line
-                  children={String(children).replace(/\n$/, '')}
-                  language={match[1]}
-                  style={dark}
-                  wrapLines={true}
-                  wrapLongLines={true}
-                />
-              ) : (
-                <code {...rest} className={className}>
-                  {children}
-                </code>
-              );
-            }
-          }}>
-          {assistantResponse}
-        </Markdown>
-      </div>
-      <ChatInput
-        onSubmit={handleSubmit}
-        isStreaming={isLoading}
-        onStop={handleStop}
-      />
-    </>
+    <div className="pt-24">
+      <ol
+        className="max-w-4xl mx-auto w-[90%] flex flex-col max-h-[75dvh] overflow-y-auto pr-3 gap-8"
+        ref={messagesRef}>
+        {messages.map(({ id, content, img, role }) => (
+          <Message key={id} content={content} img={img} role={role} />
+        ))}
+      </ol>
+      <ChatInput onSubmit={handleSubmit} isLoading={isLoading} />
+    </div>
   );
 }
