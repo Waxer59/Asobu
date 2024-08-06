@@ -1,21 +1,21 @@
-"use client";
+'use client';
 
 import React, {
   useState,
   useEffect,
   useRef,
-  TextareaHTMLAttributes,
-} from "react";
+  TextareaHTMLAttributes
+} from 'react';
 
 type Props = TextareaHTMLAttributes<HTMLTextAreaElement>;
 
 const GrowingTextArea = (props: Props) => {
-  const [textAreaValue, setTextAreaValue] = useState<string>("");
+  const [textAreaValue, setTextAreaValue] = useState<string>('');
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     if (textAreaRef.current) {
-      textAreaRef.current.style.height = "auto";
+      textAreaRef.current.style.height = 'auto';
       textAreaRef.current.style.height = `${textAreaRef.current.scrollHeight}px`;
     }
   }, [textAreaValue, props.value]);
@@ -27,10 +27,10 @@ const GrowingTextArea = (props: Props) => {
   };
 
   const handleContentKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+    if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
 
-      const form = textAreaRef.current?.closest("form");
+      const form = textAreaRef.current?.closest('form');
       if (form) {
         form.requestSubmit();
       }
@@ -44,7 +44,11 @@ const GrowingTextArea = (props: Props) => {
       value={props.value ?? textAreaValue}
       onChange={handleInputChange}
       onKeyDown={handleContentKeyDown}
-      style={{ resize: "none" }}
+      style={{
+        resize: 'none',
+        paddingLeft: 65,
+        backgroundColor: 'hsl(var(--background))'
+      }}
       rows={1}
     />
   );

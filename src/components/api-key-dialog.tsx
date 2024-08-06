@@ -20,7 +20,17 @@ import { useToast } from '@hooks/useToast';
 import { useAiStore } from '@store/ai';
 import { useEffect, useState } from 'react';
 
-export const ApiKeyDialog = () => {
+interface Props {
+  goDownInSmallerScreen?: boolean;
+}
+
+const defaultProps: Props = {
+  goDownInSmallerScreen: true
+};
+
+export const ApiKeyDialog: React.FC<Props> = ({
+  goDownInSmallerScreen = defaultProps.goDownInSmallerScreen
+}) => {
   // Let the user know with a toast to add API Key
   const { toast } = useToast();
   const apiKey = useAiStore((state) => state.apiKey);
@@ -43,7 +53,8 @@ export const ApiKeyDialog = () => {
   }, [mounted]);
 
   return (
-    <div className="absolute bottom-16 right-2 z-10 md:top-6">
+    <div
+      className={`absolute z-10 ${goDownInSmallerScreen ? 'right-2 bottom-16 md:top-6' : 'right-2 top-6'} `}>
       <Dialog>
         <TooltipProvider>
           <Tooltip>

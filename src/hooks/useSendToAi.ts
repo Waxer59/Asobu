@@ -8,8 +8,8 @@ import {
   SpotifySearch,
   CreateNoteData
 } from '@/types/types';
+import { useRouter } from 'next/navigation';
 import { UserContent, CoreMessage } from 'ai';
-import router from 'next/router';
 import { usePathname } from 'next/navigation';
 import { useAiStore } from '@store/ai';
 import { useMediaStore } from '@store/media-devices';
@@ -53,6 +53,7 @@ export const useSendToAi = ({ apiKey, playAudio }: Props) => {
   const webcam = useMediaStore((state) => state.webcam);
   const addNote = useNotesStore((state) => state.addNote);
   const whiteBoardImage = useTeachModeStore((state) => state.whiteBoardImage);
+  const router = useRouter();
 
   const sendToAi = async (text: string) => {
     if (!apiKey) {
@@ -104,6 +105,8 @@ export const useSendToAi = ({ apiKey, playAudio }: Props) => {
     ];
 
     const response = await getAiResponse(apiKey, newMessage);
+    console.log(text);
+    console.log(response);
 
     if (!response) {
       setIsAiLoading(false);
@@ -213,6 +216,13 @@ export const useSendToAi = ({ apiKey, playAudio }: Props) => {
         playAudio(
           `data:audio/mp3;base64,${await textToSpeech(apiKey, 'Closing notes')}`
         );
+        break;
+      case AiActions.OPEN_CHAT:
+        setIsSubtitlesOpen(false);
+        playAudio(
+          `data:audio/mp3;base64,${await textToSpeech(apiKey, 'Opening chat')}`
+        );
+        router.push(PATHNAMES.CHAT);
         break;
     }
 

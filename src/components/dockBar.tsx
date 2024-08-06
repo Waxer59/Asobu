@@ -53,6 +53,12 @@ export const DockBar = () => {
   });
 
   useEffect(() => {
+    if (!isSubtitlesOpen) {
+      stopAudio();
+    }
+  }, [isSubtitlesOpen]);
+
+  useEffect(() => {
     if (isRecording) {
       stopAudio();
     }

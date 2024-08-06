@@ -4,6 +4,8 @@ export enum PATHNAMES {
   CHAT = '/ai/chat'
 }
 
+export const MB_IN_BYTES = 1000000;
+
 export const TRANSLATE_LANGUAGES = [
   'Afrikaans',
   'Arabic',

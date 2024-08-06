@@ -10,7 +10,20 @@ export enum AiActions {
   CLOSE_SPOTIFY_WEB_PLAYER,
   OPEN_NOTES,
   CLOSE_NOTES,
-  CREATE_NOTE
+  CREATE_NOTE,
+  OPEN_CHAT
+}
+
+export enum MessageRoles {
+  USER = 'user',
+  ASSISTANT = 'assistant'
+}
+
+export interface MessageData {
+  id: string;
+  content: string;
+  img?: string;
+  role: MessageRoles;
 }
 
 export interface NoteData {
