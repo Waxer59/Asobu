@@ -65,7 +65,7 @@ export const DockBar = () => {
   }, [isRecording]);
 
   return (
-    <div className="bottom-3 absolute left-0 right-0 flex flex-col items-center gap-4 justify-center">
+    <div className="bottom-3 absolute left-0 right-0 flex flex-col items-center gap-4 justify-center z-40">
       {isSubtitlesOpen && <Subtitles />}
       <Card className="flex justify-center gap-2 z-10 p-2 relative px-5">
         <DockbarNavigation
