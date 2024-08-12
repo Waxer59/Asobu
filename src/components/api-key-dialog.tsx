@@ -54,7 +54,7 @@ export const ApiKeyDialog: React.FC<Props> = ({
 
   return (
     <div
-      className={`absolute z-10 ${goDownInSmallerScreen ? 'right-2 bottom-16 md:top-6' : 'right-2 top-6'} `}>
+      className={`absolute ${goDownInSmallerScreen ? 'right-2 bottom-16 md:top-6' : 'right-2 top-6'} `}>
       <Dialog>
         <TooltipProvider>
           <Tooltip>

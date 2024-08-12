@@ -9,7 +9,10 @@ import '@styles/globals.css';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Asobu | Chat'
+  title: 'Asobu | Chat',
+  openGraph: {
+    title: 'Asobu | Chat'
+  }
 };
 
 export default function ChatLayout({
