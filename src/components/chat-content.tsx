@@ -3,9 +3,6 @@
 import { useEffect, useRef, useState } from 'react';
 import ChatInput from '@components/chat-input';
 
-// Allow streaming responses up to 30 seconds
-export const maxDuration = 30;
-
 import { convertFileToBase64 } from '@lib/utils';
 import { Message } from './message';
 import { MessageData, MessageRoles } from '@/types/types';
