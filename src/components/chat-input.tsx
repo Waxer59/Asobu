@@ -14,7 +14,7 @@ import {
 import { BeatLoader } from 'react-spinners';
 
 interface Props {
-  onSubmit?: (value: string, file?: File) => void;
+  onSubmit: (value: string, file?: File) => void;
   isLoading: boolean;
 }
 
@@ -25,7 +25,7 @@ export default function ChatInput({ onSubmit, isLoading }: Props) {
   );
 
   const submit = (value: string) => {
-    onSubmit?.(value, selectedImage);
+    onSubmit(value, selectedImage);
     setContent('');
     setSelectedImage(undefined);
   };
