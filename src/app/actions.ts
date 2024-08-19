@@ -107,7 +107,7 @@ export async function textToSpeech(
 export async function continueConversation(
   apiKey: string,
   history: CoreMessage[]
-): Promise<string> {
+): Promise<string | null> {
   'use server';
 
   const openai = createOpenAI({
@@ -115,13 +115,17 @@ export async function continueConversation(
     compatibility: 'strict' // strict mode, enable when using the OpenAI API
   });
 
-  const { text } = await generateText({
-    model: openai('gpt-4o'),
-    system: 'You are a friendly assistant!',
-    messages: history
-  });
+  try {
+    const { text } = await generateText({
+      model: openai('gpt-4o'),
+      system: 'You are a friendly assistant!',
+      messages: history
+    });
 
-  return text;
+    return text;
+  } catch (error) {
+    return null;
+  }
 }
 
 export async function getAiResponse(

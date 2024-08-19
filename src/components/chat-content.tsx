@@ -84,6 +84,16 @@ export default function ChatContent() {
       }) as CoreMessage[]
     );
 
+    if (!response) {
+      setIsLoading(false);
+      toast({
+        title: 'Error',
+        description: 'Something went wrong',
+        variant: 'destructive'
+      });
+      return;
+    }
+
     addMessage({
       id: crypto.randomUUID(),
       role: MessageRoles.ASSISTANT,
