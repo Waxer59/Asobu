@@ -18,8 +18,6 @@ import OpenAI, { toFile } from 'openai';
 import { z } from 'zod';
 import { TRANSLATE_LANGUAGES } from '@constants';
 
-export const maxDuration = 60; // seconds
-
 export async function translateText(
   apiKey: string,
   translateText: string,
