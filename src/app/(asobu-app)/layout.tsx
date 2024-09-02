@@ -6,10 +6,7 @@ import type { ReactNode } from 'react';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'AI',
-  openGraph: {
-    title: 'AI'
-  }
+  title: 'AI'
 };
 
 export default function AppLayout({
