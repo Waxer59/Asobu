@@ -1,16 +1,23 @@
 import { Analytics } from '@vercel/analytics/react';
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
 import { ReactNode } from 'react';
+import '@styles/globals.css';
 
 export const metadata: Metadata = {
-  title: 'Asobu | Home',
+  title: {
+    template: 'Asobu | %s',
+    default: 'Home'
+  },
   description:
     'Asobu, derived from the Japanese word for "play," is a project that explores the possibilities of AI by integrating various interactive and assistive features. Developed for the Midudev 2024 hackathon, Asobu showcases the versatility of AI by combining music, navigation, translation, education, note-taking, chat, image recognition, and voice commands into a single platform.',
   icons: {
     icon: '/favicon.png'
   },
   openGraph: {
-    title: 'Asobu | Home',
+    title: {
+      template: 'Asobu | %s',
+      default: 'Home'
+    },
     description:
       'Asobu, derived from the Japanese word for "play," is a project that explores the possibilities of AI by integrating various interactive and assistive features. Developed for the Midudev 2024 hackathon, Asobu showcases the versatility of AI by combining music, navigation, translation, education, note-taking, chat, image recognition, and voice commands into a single platform.',
     type: 'website',
