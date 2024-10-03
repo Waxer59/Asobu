@@ -36,7 +36,6 @@
     "react-dom": "18.3.1",
     "react-draggable": "4.4.6",
     "react-hook-form": "7.52.1",
-    "react-leaflet": "4.2.1",
     "react-markdown": "9.0.1",
     "react-spinners": "0.14.1",
     "react-spotify-web-playback": "0.14.4",
@@ -57,21 +56,21 @@
     "@types/react-dom": "18.3.0",
     "@types/react-syntax-highlighter": "15.5.13",
     "@types/react-webcam": "3.0.0",
-    "eslint": "9.8.0",
+    "eslint": "8",
     "eslint-config-next": "14.2.5",
     "husky": "9.1.4",
     "lint-staged": "15.2.7",
     "postcss": "8.4.40",
     "prettier": "3.3.3",
     "tailwindcss": "3.4.7",
-    "typescript": "5.5.4",
+    "typescript": "5",
     "use-debounce": "10.0.2"
   },
   "lint-staged": {
-    "apps/**/*.{ts,tsx,js,jsx}": [
+    "src/**/*.{ts,tsx,js,jsx}": [
       "eslint --fix"
     ],
-    "*.{ts,tsx,js,jsx,html,css,md}": [
+    "src/**/*.{ts,tsx,js,jsx,html,css,md}": [
       "prettier --write"
     ]
   }

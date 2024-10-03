@@ -64,7 +64,7 @@ export default function Page() {
               description: 'Error accessing camera'
             });
           }}
-          className="rounded-md h-full"
+          className="rounded-md h-full mx-auto"
         />
       </Card>
     </main>

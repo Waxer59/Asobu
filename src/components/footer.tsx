@@ -19,6 +19,7 @@ export function Footer() {
             </Button>
           </div>
           <p className="text-muted-foreground">
+            {/* eslint-disable-next-line react/no-unescaped-entities */}
             Built with Next.js and Vercel's AI SDK
           </p>
         </Container>
