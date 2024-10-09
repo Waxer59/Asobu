@@ -22,6 +22,18 @@ const ExcalidrawWrapper = () => {
   useEffect(() => {
     if (!excalidrawAPI) return;
 
+    const getWhiteBoardImageBlob = async (): Promise<Blob | null> => {
+      if (!excalidrawAPI) return null;
+
+      const blob = await exportToBlob({
+        elements: excalidrawAPI.getSceneElements(),
+        mimeType: 'image/png',
+        files: excalidrawAPI.getFiles()
+      });
+
+      return blob;
+    };
+
     excalidrawAPI.onPointerUp(async () => {
       const blob = await getWhiteBoardImageBlob();
 
@@ -30,19 +42,7 @@ const ExcalidrawWrapper = () => {
       const base64 = await convertBlobToBase64(blob);
       setWhiteBoardImage(base64);
     });
-  }, [excalidrawAPI]);
-
-  const getWhiteBoardImageBlob = async (): Promise<Blob | null> => {
-    if (!excalidrawAPI) return null;
-
-    const blob = await exportToBlob({
-      elements: excalidrawAPI.getSceneElements(),
-      mimeType: 'image/png',
-      files: excalidrawAPI.getFiles()
-    });
-
-    return blob;
-  };
+  }, [excalidrawAPI, setWhiteBoardImage]);
 
   return <Excalidraw theme="dark" excalidrawAPI={setExcalidrawAPI} />;
 };

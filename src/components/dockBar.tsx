@@ -56,13 +56,13 @@ export const DockBar = () => {
     if (!isSubtitlesOpen) {
       stopAudio();
     }
-  }, [isSubtitlesOpen]);
+  }, [isSubtitlesOpen, stopAudio]);
 
   useEffect(() => {
     if (isRecording) {
       stopAudio();
     }
-  }, [isRecording]);
+  }, [isRecording, stopAudio]);
 
   return (
     <div className="bottom-3 absolute left-0 right-0 flex flex-col items-center gap-4 justify-center z-40">

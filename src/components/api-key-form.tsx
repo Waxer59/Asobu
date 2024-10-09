@@ -35,7 +35,7 @@ export default function APIKeyForm() {
     if (apiKey) {
       form.setValue('apiKey', apiKey);
     }
-  }, [apiKey]);
+  }, [apiKey, form]);
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     const apiKeyInputValue = values.apiKey;

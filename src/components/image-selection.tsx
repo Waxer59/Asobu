@@ -87,6 +87,7 @@ export default function ImageSelection({
       </label>
       {preview && (
         <div className="w-full p-2">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={preview}
             alt="Selected"

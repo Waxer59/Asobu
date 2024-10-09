@@ -32,7 +32,7 @@ export const Navigation = () => {
     if (navigationFrom) return;
 
     map.current?.setCenter({ lat, lng });
-  }, [lat, lng]);
+  }, [lat, lng, navigationFrom]);
 
   useEffect(() => {
     if (navigator.geolocation && !watchID.current) {
@@ -76,7 +76,7 @@ export const Navigation = () => {
         navigator.geolocation.clearWatch(watchID.current);
       }
     };
-  }, []);
+  }, [navigationFrom, navigationTo]);
 
   const onClose = () => {
     setIsNavigationOpen(false);

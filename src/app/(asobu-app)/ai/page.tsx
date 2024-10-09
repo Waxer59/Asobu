@@ -29,7 +29,7 @@ export default function Page() {
     if (webcamRef.current) {
       setWebcam(webcamRef.current);
     }
-  }, [webcamRef]);
+  }, [setWebcam, webcamRef]);
 
   return (
     <main className="w-full h-full flex p-4">

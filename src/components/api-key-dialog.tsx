@@ -50,7 +50,7 @@ export const ApiKeyDialog: React.FC<Props> = ({
         description: 'Please add your OpenAI API Key'
       });
     }
-  }, [mounted]);
+  }, [apiKey, mounted, toast]);
 
   return (
     <div

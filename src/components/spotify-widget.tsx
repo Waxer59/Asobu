@@ -22,7 +22,7 @@ export default function SpotifyWidget() {
     };
 
     fetchSong();
-  }, [query]);
+  }, [authSession, query, token]);
 
   return (
     <div className="absolute bottom-40 right-10">

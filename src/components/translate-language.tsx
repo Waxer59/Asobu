@@ -47,13 +47,13 @@ export const TranslateLanguage = ({
     if (translationText === debouncedText) return;
 
     onTranslationTextChange(debouncedText);
-  }, [debouncedText]);
+  }, [debouncedText, onTranslationTextChange, translationText]);
 
   useEffect(() => {
     if (text.trim() === '') {
       onTranslationTextChange('');
     }
-  }, [text]);
+  }, [onTranslationTextChange, text]);
 
   useEffect(() => {
     setText(translationText);

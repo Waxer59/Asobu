@@ -29,7 +29,7 @@ export const useMicrophone = ({ onGetChunks }: UseMicrophoneProps) => {
     if (!chunks.length) return;
     onGetChunks(chunks);
     setChunks([]);
-  }, [chunks]);
+  }, [chunks, onGetChunks]);
 
   useEffect(() => {
     if (!mediaRecorder) return;
