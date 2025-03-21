@@ -57,7 +57,7 @@ export async function transcribeAudio(
   'use server';
 
   const openai = new OpenAI({
-    apiKey: apiKey
+    apiKey
   });
 
   const audioBuffer = Buffer.from(base64Audio.split('base64,')[1], 'base64');
